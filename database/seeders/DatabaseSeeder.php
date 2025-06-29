@@ -18,21 +18,21 @@ class DatabaseSeeder extends Seeder
         User::create([
             'username' => 'superadmin',
             'email' => 'superadmin@novaflow.com.my',
-            'password' => Hash::make('1111'), // hashed
+            'password' => Hash::make('1111'),
             'role' => 'superadmin',
         ]);
 
         User::create([
             'username' => 'admin1',
             'email' => 'admin1@utar.com.my',
-            'password' => Hash::make('2222'), // hashed
+            'password' => Hash::make('2222'),
             'role' => 'admin',
         ]);
 
         User::create([
             'username' => 'admin2',
             'email' => 'admin2@novaflow.com.my',
-            'password' => Hash::make('3333'), // hashed
+            'password' => Hash::make('3333'),
             'role' => 'admin',
         ]);
     }
