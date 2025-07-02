@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\RegisterController;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,10 +15,58 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+// Landing page
 Route::get('/', function () {
+    if (auth()->check()) {
+        switch (auth()->user()->role) {
+            case 'superadmin':
+                return redirect('/superadmin/dashboard');
+            case 'admin':
+                return redirect('/admin/dashboard');
+            case 'client':
+                return redirect('/client/dashboard');
+            default:
+                abort(403, 'Invalid role or misconfiguration');
+        }
+    }
+
     return view('welcome');
 });
 
-Auth::routes();
+Route::get('/error', function () {
+    return "Unknown role. Please contact admin.";
+});
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+// Show login form
+Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
+
+// Handle login POST
+Route::post('/login', [LoginController::class, 'login']);
+
+// Handle logout
+Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+
+// Registration form
+Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
+Route::post('/register', [RegisterController::class, 'register']);
+
+// Dashboard routes
+Route::middleware('auth')->get('/superadmin/dashboard', function () {
+    return view('dashboards.superadmin');
+})->name('superadmin.dashboard');
+
+Route::middleware('auth')->get('/admin/dashboard', function () {
+    return view('dashboards.admin');
+})->name('admin.dashboard');
+
+Route::middleware('auth')->get('/client/dashboard', function () {
+    return view('dashboards.client');
+})->name('client.dashboard');
+
+// Reset session and logout (testing purposes)
+Route::get('/reset-session', function () {
+    Auth::logout();
+    session()->flush();
+    return redirect('/login');
+});
