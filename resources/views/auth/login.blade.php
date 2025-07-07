@@ -35,12 +35,12 @@
                         @csrf
 
                         <div class="mb-3">
-                            <label for="email" class="form-label">Email address</label>
-                            <input type="email"
+                            <label for="username" class="form-label">Username</label>
+                            <input type="username"
                                    class="form-control"
-                                   id="email"
-                                   name="email"
-                                   placeholder="Enter email"
+                                   id="username"
+                                   name="username"
+                                   placeholder="Enter username"
                                    required>
                         </div>
 
@@ -54,25 +54,11 @@
                                    required>
                         </div>
 
-                        <div class="mb-3">
-                            <label for="role" class="form-label">Login as</label>
-                            <select class="form-select" id="role" name="role" required>
-                                <option value="">-- Select Role --</option>
-                                <option value="superadmin">Superadmin</option>
-                                <option value="admin">Admin</option>
-                                <option value="client">Client</option>
-                            </select>
-                        </div>
-
                         <div class="d-grid">
                             <button type="submit" class="btn btn-primary">Login</button>
                         </div>
 
                     </form>
-
-                    <div class="mt-3 text-center">
-                        <small>Don't have an account? <a href="{{ route('register') }}">Register</a></small>
-                    </div>
 
                 </div>
             </div>

@@ -31,17 +31,17 @@ class LoginController extends Controller
      */
     protected function redirectTo()
     {
-        $role = auth()->user()->role;
+        $username = auth()->user()->username;
 
-        \Log::info("Redirecting user with role: " . $role);
+        \Log::info("Redirecting user with username: " . $username);
 
-        switch ($role) {
+        switch ($username) {
             case 'superadmin':
-                return '/superadmin/dashboard';
+                return '/dashboard';
             case 'admin':
                 return '/admin/dashboard';
             case 'client':
-                return '/client/dashboard';
+                return '/dashboard';
             default:
                 return '/error';
         }
@@ -51,6 +51,11 @@ class LoginController extends Controller
     { 
         return view('auth.login'); 
     }
+
+    public function username()
+{
+    return 'username';
+}
 
     /**
      * Create a new controller instance.
@@ -65,9 +70,9 @@ class LoginController extends Controller
     protected function credentials(Request $request)
     {
         return [
-            'email' => $request->email,
+            'username' => $request->username,
             'password' => $request->password,
-            'role' => $request->role,
+
         ];
     }
 }

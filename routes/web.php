@@ -18,7 +18,7 @@ use App\Http\Controllers\Auth\RegisterController;
 // Landing page
 Route::get('/', function () {
     if (auth()->check()) {
-        switch (auth()->user()->role) {
+        switch (auth()->user()->username) {
             case 'superadmin':
                 return redirect('/superadmin/dashboard');
             case 'admin':
@@ -26,7 +26,7 @@ Route::get('/', function () {
             case 'client':
                 return redirect('/client/dashboard');
             default:
-                abort(403, 'Invalid role or misconfiguration');
+                abort(403, 'Invalid username or misconfiguration');
         }
     }
 
@@ -34,7 +34,7 @@ Route::get('/', function () {
 });
 
 Route::get('/error', function () {
-    return "Unknown role. Please contact admin.";
+    return "Unknown username. Please contact admin.";
 });
 
 
@@ -46,10 +46,6 @@ Route::post('/login', [LoginController::class, 'login']);
 
 // Handle logout
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
-
-// Registration form
-Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
-Route::post('/register', [RegisterController::class, 'register']);
 
 // Dashboard routes
 Route::middleware('auth')->get('/superadmin/dashboard', function () {
@@ -70,3 +66,16 @@ Route::get('/reset-session', function () {
     session()->flush();
     return redirect('/login');
 });
+
+
+
+
+
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/dashboard', fn() => view('dashboard'));
+    Route::get('/profile', fn() => view('profile'));
+    Route::get('/superadmin/manage', fn() => view('superadmin.manage'));
+    Route::get('/admin/clients', fn() => view('admin.clients'));
+});
+
