@@ -19,21 +19,18 @@ class DatabaseSeeder extends Seeder
             'username' => 'superadmin',
             'email' => 'superadmin@novaflow.com.my',
             'password' => Hash::make('1111'),
-            'role' => 'superadmin',
         ]);
 
         User::create([
             'username' => 'admin',
             'email' => 'admin@utar.com.my',
             'password' => Hash::make('2222'),
-            'role' => 'admin',
         ]);
 
         User::create([
-            'username' => 'admin2',
-            'email' => 'admin2@novaflow.com.my',
+            'username' => 'admin1',
+            'email' => 'admin1@novaflow.com.my',
             'password' => Hash::make('3333'),
-            'role' => 'admin',
         ]);
     }
 }
