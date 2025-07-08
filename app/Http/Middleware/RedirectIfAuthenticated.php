@@ -20,16 +20,7 @@ class RedirectIfAuthenticated
     public function handle(Request $request, Closure $next, ...$guards)
     {
         if (Auth::check()) {
-            switch (Auth::user()->username) {
-                case 'superadmin':
-                    return redirect('/superadmin/dashboard');
-                case 'admin':
-                    return redirect('/admin/dashboard');
-                case 'client':
-                    return redirect('/client/dashboard');
-                default:
-                    return redirect('/');
-            }
+            return redirect('/dashboard');
         }
 
         return $next($request);

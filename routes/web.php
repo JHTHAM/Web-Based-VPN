@@ -2,7 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\Auth\RegisterController;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,22 +14,8 @@ use App\Http\Controllers\Auth\RegisterController;
 |
 */
 
-// Landing page
 Route::get('/', function () {
-    if (auth()->check()) {
-        switch (auth()->user()->username) {
-            case 'superadmin':
-                return redirect('/superadmin/dashboard');
-            case 'admin':
-                return redirect('/admin/dashboard');
-            case 'client':
-                return redirect('/client/dashboard');
-            default:
-                abort(403, 'Invalid username or misconfiguration');
-        }
-    }
-
-    return view('welcome');
+    return view('welcome'); 
 });
 
 Route::get('/error', function () {
@@ -48,17 +33,11 @@ Route::post('/login', [LoginController::class, 'login']);
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 // Dashboard routes
-Route::middleware('auth')->get('/superadmin/dashboard', function () {
-    return view('dashboards.superadmin');
-})->name('superadmin.dashboard');
-
-Route::middleware('auth')->get('/admin/dashboard', function () {
-    return view('dashboards.admin');
-})->name('admin.dashboard');
-
-Route::middleware('auth')->get('/client/dashboard', function () {
-    return view('dashboards.client');
-})->name('client.dashboard');
+Route::middleware('auth')->group(function () {
+    Route::get('/dashboard', function () {
+        return view('dashboard');
+    });
+});
 
 // Reset session and logout (testing purposes)
 Route::get('/reset-session', function () {
@@ -74,8 +53,9 @@ Route::get('/reset-session', function () {
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', fn() => view('dashboard'));
-    Route::get('/profile', fn() => view('profile'));
-    Route::get('/superadmin/manage', fn() => view('superadmin.manage'));
-    Route::get('/admin/clients', fn() => view('admin.clients'));
+    Route::get('/routers', fn() => view('routers'));
+    Route::get('/networks', fn() => view('networks'));
+    Route::get('/devices_in_networks', fn() => view('devices_in_networks'));
+    Route::get('/standalone_vpn_clients', fn() => view('standalone_vpn_clients'));
+    Route::get('/administration', fn() => view('administration'));
 });
-

@@ -14,7 +14,7 @@
         }
 
         .sidebar {
-            width: 220px;
+            width: 230px;
             background: #2c3e50;
             color: #ecf0f1;
             padding: 20px;
@@ -107,15 +107,13 @@
 
     {{-- Sidebar --}}
     <div class="sidebar">
-        <h2>MyApp</h2>
+        <h2>WebBasedVpn</h2>
         <a href="{{ url('/dashboard') }}">Dashboard</a>
-        <a href="{{ url('/profile') }}">Profile</a>
-
-        @if (Auth::check() && Auth::user()->username === 'superadmin')
-            <a href="{{ url('/superadmin/manage') }}">Manage Users</a>
-        @elseif (Auth::check() && Auth::user()->username === 'admin')
-            <a href="{{ url('/admin/clients') }}">Client List</a>
-        @endif
+        <a href="{{ url('/routers') }}">Routers</a>
+        <a href="{{ url('/networks') }}">Networks</a>
+        <a href="{{ url('/devices_in_networks') }}">Devices in Networks</a>
+        <a href="{{ url('/standalone_vpn_clients') }}">Standalone VPN Clients</a>
+        <a href="{{ url('/administration') }}">Administration</a>
     </div>
 
     {{-- Main content area --}}

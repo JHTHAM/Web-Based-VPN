@@ -33,18 +33,7 @@ class LoginController extends Controller
     {
         $username = auth()->user()->username;
 
-        \Log::info("Redirecting user with username: " . $username);
-
-        switch ($username) {
-            case 'superadmin':
-                return '/dashboard';
-            case 'admin':
-                return '/admin/dashboard';
-            case 'client':
-                return '/dashboard';
-            default:
-                return '/error';
-        }
+        return '/dashboard';
     }
 
     public function showLoginForm() 
