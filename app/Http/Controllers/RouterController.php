@@ -41,7 +41,6 @@ class RouterController extends Controller
             'name' => $name,
             'ip_address' => null,
             'status' => 'offline',
-            'sync_status' => 'pending',
         ]);
 
         // Step 2: SSH command to run remote script
@@ -75,7 +74,6 @@ class RouterController extends Controller
         if (file_exists($localPath)) {
             $router->ip_address = $assignedIp;
             $router->ovpn_path = $localPath;
-            $router->sync_status = 'synced';
             $router->save();
             \Log::info("✅ .ovpn fetched and saved for router: $name");
         } else {
@@ -106,6 +104,19 @@ class RouterController extends Controller
 
         // Step 4: Return with status message
         return redirect()->back()->with('success', "Router '$name' deleted and remote cleanup completed.");
+    }
+
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'label' => 'nullable|string|max:255',
+        ]);
+
+        $router = Router::findOrFail($id);
+        $router->label = $request->label ?? ''; 
+        $router->save();
+
+        return redirect()->back()->with('success', 'Router updated successfully.');
     }
 
     // Download OVPN

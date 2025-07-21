@@ -14,7 +14,6 @@ class Router extends Model
         'ip_address',
         'label',
         'status',
-        'sync_status',
         'ovpn_path',
     ];
 }

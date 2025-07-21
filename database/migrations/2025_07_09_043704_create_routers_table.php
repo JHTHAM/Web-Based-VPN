@@ -19,7 +19,6 @@ class CreateRoutersTable extends Migration
         $table->string('ip_address')->nullable();
         $table->string('label')->nullable();
         $table->enum('status', ['online', 'offline'])->default('offline');
-        $table->enum('sync_status', ['synced', 'pending'])->default('pending');
         $table->string('ovpn_path')->nullable(); // path to .ovpn file
         $table->timestamps();
     });

@@ -35,7 +35,6 @@
                 <th>Label</th>
                 <th>Networks</th>
                 <th>Status</th>
-                <th>Sync</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -48,7 +47,7 @@
             @method('PUT')
 
             <td>
-                <input type="text" name="name" value="{{ $router->name }}" class="form-control" required>
+                <input type="text" name="name" value="{{ $router->name }}" class="form-control" readonly>
             </td>
             <td>{{ $router->ip_address }}</td>
             <td>
@@ -60,13 +59,6 @@
                     <span class="badge bg-success">🟢 Online</span>
                 @else
                     <span class="badge bg-danger">🔴 Offline</span>
-                @endif
-            </td>
-            <td>
-                @if($router->sync_status === 'synced')
-                    <span class="badge bg-success">🟢 Synced</span>
-                @else
-                    <span class="badge bg-warning text-dark">🟠 Pending</span>
                 @endif
             </td>
             <td>
