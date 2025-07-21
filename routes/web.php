@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\RouterController;
 
 /*
 |--------------------------------------------------------------------------
@@ -50,7 +51,7 @@ Route::get('/reset-session', function () {
 
 
 
-
+// Authentication routes
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', fn() => view('dashboard'));
     Route::get('/routers', fn() => view('routers'));
@@ -59,3 +60,13 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/standalone_vpn_clients', fn() => view('standalone_vpn_clients'));
     Route::get('/administration', fn() => view('administration'));
 });
+
+
+// Router routes
+Route::get('/routers', [RouterController::class, 'index'])->name('routers.index');           // Show router page
+Route::post('/routers', [RouterController::class, 'store'])->name('routers.store');          // Create new router
+Route::put('/routers/{id}', [RouterController::class, 'update'])->name('routers.update');    // Update router
+Route::delete('/routers/{id}', [RouterController::class, 'destroy'])->name('routers.destroy'); // Delete router
+Route::get('/routers/{id}/download', [RouterController::class, 'downloadOvpn'])->name('download.ovpn'); // Download .ovpn
+
+Route::get('/dashboard', [RouterController::class, 'dashboard'])->name('dashboard');
