@@ -55,11 +55,10 @@
             </td>
             <td>1</td>
             <td>
-                @if($router->status === 'online')
-                    <span class="badge bg-success">🟢 Online</span>
-                @else
-                    <span class="badge bg-danger">🔴 Offline</span>
-                @endif
+                <span id="status-{{ $router->id }}" 
+                    class="badge {{ $router->status === 'online' ? 'bg-success' : 'bg-danger' }}">
+                    {{ $router->status === 'online' ? '🟢 Online' : '🔴 Offline' }}
+                </span>
             </td>
             <td>
                 <div class="d-flex gap-1">
@@ -72,15 +71,40 @@
             @method('DELETE')
             <button type="submit" class="btn btn-sm btn-danger">Delete</button>
         </form>
-    </tr>
-@endforeach
+            </tr>
+        @endforeach
 
         </tbody>
     </table>
 </div>
 
-{{-- Search JS --}}
+{{-- Search and StatusJS --}}
 <script>
+function refreshStatuses() {
+    fetch("{{ route('routers.status') }}")
+        .then(response => response.json())
+        .then(data => {
+            for (const [id, status] of Object.entries(data)) {
+                const badge = document.getElementById(`status-${id}`);
+                if (badge) {
+                    if (status === 'online') {
+                        badge.classList.remove('bg-danger');
+                        badge.classList.add('bg-success');
+                        badge.textContent = '🟢 Online';
+                    } else {
+                        badge.classList.remove('bg-success');
+                        badge.classList.add('bg-danger');
+                        badge.textContent = '🔴 Offline';
+                    }
+                }
+            }
+        })
+        .catch(error => console.error('Status update failed:', error));
+    }
+
+    // Refresh every 5 seconds
+    setInterval(refreshStatuses, 5000);
+
     document.getElementById("searchInput").addEventListener("keyup", function () {
         const filter = this.value.toLowerCase();
         const rows = document.querySelectorAll("#routerTable tbody tr");

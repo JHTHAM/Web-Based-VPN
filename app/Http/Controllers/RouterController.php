@@ -12,9 +12,45 @@ use Symfony\Component\Process\Exception\ProcessFailedException;
 
 class RouterController extends Controller
 {
+    public function fetchStatus()
+    {
+        $remoteFile = '/etc/openvpn//server/openvpn-status.log';
+        $sshCommand = "ssh utar@vpn.novaplus.my \"cat $remoteFile\"";
+        $output = shell_exec($sshCommand);
+
+        $activeRouters = [];
+        if ($output) {
+            foreach (explode("\n", $output) as $line) {
+                if (str_starts_with($line, 'CLIENT_LIST')) {
+                    $fields = str_getcsv($line);
+
+                    // Only count valid lines where the first field is "CLIENT_LIST"
+                    // and the second field (Common Name) exists
+                    if (isset($fields[1]) && $fields[0] === 'CLIENT_LIST') {
+                        $clientName = trim($fields[1]);
+                        if ($clientName !== '') {
+                            $activeRouters[] = $clientName;
+                        }
+                    }
+                }
+            }
+        }
+
+        // Build the statuses array
+        $statuses = [];
+        foreach (Router::all() as $router) {
+            $statuses[$router->id] = in_array($router->name, $activeRouters)
+                ? 'online'
+                : 'offline';
+        }
+
+        return response()->json($statuses);
+    }
+
     // Show all routers
     public function index()
     {
+        $this->fetchStatus();
         $routers = Router::all();
         return view('routers', compact('routers'));
     }
@@ -22,11 +58,11 @@ class RouterController extends Controller
     // Show dashboard
     public function dashboard()
     {
+        $this->fetchStatus();
         $routers = Router::all();
         return view('dashboard', compact('routers'));
     }
 
-    
     // Store a new router
     public function store(Request $request)
     {

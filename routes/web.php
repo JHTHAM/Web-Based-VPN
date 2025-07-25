@@ -70,3 +70,7 @@ Route::delete('/routers/{id}', [RouterController::class, 'destroy'])->name('rout
 Route::get('/routers/{id}/download', [RouterController::class, 'downloadOvpn'])->name('download.ovpn'); // Download .ovpn
 
 Route::get('/dashboard', [RouterController::class, 'dashboard'])->name('dashboard');
+
+
+Route::get('/routers/status', [RouterController::class, 'fetchStatus'])->name('routers.status');
+
