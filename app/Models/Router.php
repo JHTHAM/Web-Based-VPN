@@ -2,13 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Router extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
         'name',
         'ip_address',
@@ -16,4 +13,8 @@ class Router extends Model
         'status',
         'ovpn_path',
     ];
+
+    public function networks() {
+        return $this->belongsToMany(Network::class, 'network_router');
+    }
 }

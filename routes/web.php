@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\RouterController;
+use App\Http\Controllers\NetworkController;
 
 /*
 |--------------------------------------------------------------------------
@@ -48,16 +49,12 @@ Route::get('/reset-session', function () {
 });
 
 
-
-
-
 // Authentication routes
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', fn() => view('dashboard'));
     Route::get('/routers', fn() => view('routers'));
     Route::get('/networks', fn() => view('networks'));
     Route::get('/devices_in_networks', fn() => view('devices_in_networks'));
-    Route::get('/standalone_vpn_clients', fn() => view('standalone_vpn_clients'));
     Route::get('/administration', fn() => view('administration'));
 });
 
@@ -70,7 +67,17 @@ Route::delete('/routers/{id}', [RouterController::class, 'destroy'])->name('rout
 Route::get('/routers/{id}/download', [RouterController::class, 'downloadOvpn'])->name('download.ovpn'); // Download .ovpn
 
 Route::get('/dashboard', [RouterController::class, 'dashboard'])->name('dashboard');
-
-
 Route::get('/routers/status', [RouterController::class, 'fetchStatus'])->name('routers.status');
+
+
+// Network routes
+Route::get('/networks', [NetworkController::class, 'index'])->name('networks.index');
+Route::post('/networks', [NetworkController::class, 'store'])->name('networks.store');
+Route::delete('/networks/{network}', [NetworkController::class, 'destroy'])->name('networks.destroy');
+
+Route::get('/networks/{network}/devices', [NetworkController::class, 'devices'])->name('network.devices');
+Route::post('/networks/{network}/devices', [NetworkController::class, 'addDevices'])->name('network.devices.store');
+Route::delete('/networks/{network}/devices/{router}', [NetworkController::class, 'removeDevice'])->name('network.devices.destroy');
+
+Route::get('/fetch-status', [NetworkController::class, 'fetchStatus']);
 

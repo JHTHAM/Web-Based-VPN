@@ -14,8 +14,8 @@ class RouterController extends Controller
 {
     public function fetchStatus()
     {
-        $remoteFile = '/etc/openvpn//server/openvpn-status.log';
-        $sshCommand = "ssh utar@vpn.novaplus.my \"cat $remoteFile\"";
+        $remoteFile = '/etc/openvpn/openvpn-status.log';
+        $sshCommand = "ssh utar@10.8.0.1 \"cat $remoteFile\"";
         $output = shell_exec($sshCommand);
 
         $activeRouters = [];
@@ -68,7 +68,7 @@ class RouterController extends Controller
     {
         $request->validate([
             'name' => 'required|string|unique:routers,name',
-        ]);
+        ], ['name.unique' => 'This router name is already taken. Please choose another.']);
 
         $name = $request->name;
 
@@ -82,7 +82,7 @@ class RouterController extends Controller
         // Step 2: SSH command to run remote script
         $clientName = escapeshellarg($name);
         $remoteScript = "bash /opt/shared_vpn/client-configs/generate_ovpn.sh $clientName";
-        $sshCommand = "ssh utar@vpn.novaplus.my \"$remoteScript\"";
+        $sshCommand = "ssh utar@10.8.0.1 \"$remoteScript\"";
 
         Log::info("Running SSH command: $sshCommand");
         $sshOutput = shell_exec($sshCommand);
@@ -93,7 +93,7 @@ class RouterController extends Controller
         $assignedIp = end($lines);
 
         // Step 3: SCP back .ovpn file from remote server
-        $remoteFile = "utar@vpn.novaplus.my:/opt/shared_vpn/client-configs/files/{$name}.ovpn";
+        $remoteFile = "utar@10.8.0.1:/opt/shared_vpn/client-configs/files/{$name}.ovpn";
         $localDir = storage_path('app/ovpn');
         $localPath = "$localDir/{$name}.ovpn";
 
@@ -128,7 +128,7 @@ class RouterController extends Controller
         // Step 1: Build remote script command
         $clientName = escapeshellarg($name);
         $remoteScript = "bash /opt/shared_vpn/client-configs/delete_ovpn.sh $clientName";
-        $sshCommand = "ssh utar@vpn.novaplus.my \"$remoteScript\"";
+        $sshCommand = "ssh utar@10.8.0.1 \"$remoteScript\"";
 
         // Step 2: Run SSH command and capture output
         \Log::info("Running SSH command for deletion: $sshCommand");

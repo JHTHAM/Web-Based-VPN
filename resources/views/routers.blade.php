@@ -18,6 +18,16 @@
             <div class="col-md-2">
                 <button type="submit" class="btn btn-primary">Create Router</button>
             </div>
+
+            @if ($errors->any())
+                <div class="alert alert-danger">
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
         </div>
     </form>
 
@@ -53,7 +63,13 @@
             <td>
                 <input type="text" name="label" value="{{ $router->label }}" class="form-control">
             </td>
-            <td>1</td>
+            <td>
+                @if ($router->networks->count())
+                    {{ $router->networks->pluck('name')->join(', ') }}
+                @else
+                    N/A
+                @endif
+            </td>
             <td>
                 <span id="status-{{ $router->id }}" 
                     class="badge {{ $router->status === 'online' ? 'bg-success' : 'bg-danger' }}">

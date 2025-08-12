@@ -104,15 +104,24 @@
     </style>
 </head>
 <body>
-
     {{-- Sidebar --}}
     <div class="sidebar">
         <h2>WebBasedVpn</h2>
         <a href="{{ url('/dashboard') }}">Dashboard</a>
         <a href="{{ url('/routers') }}">Routers</a>
         <a href="{{ url('/networks') }}">Networks</a>
-        <a href="{{ url('/devices_in_networks') }}">Devices in Networks</a>
-        <a href="{{ url('/standalone_vpn_clients') }}">Standalone VPN Clients</a>
+        <a href="#" class="nav-link" id="devicesSidebarToggle">
+            <span>Devices in Networks ▾</span>
+        </a>
+        <ul id="devicesSidebarMenu" class="nav flex-column ms-3" style="display: none;">
+            @foreach(\App\Models\Network::all() as $network)
+                <li class="nav-item">
+                    <a href="{{ route('network.devices', ['network' => $network->id]) }}" class="nav-link">
+                        {{ $network->name }}
+                    </a>
+                </li>
+            @endforeach
+        </ul>
         <a href="{{ url('/administration') }}">Administration</a>
     </div>
 
@@ -136,6 +145,8 @@
         </div>
 
         <div class="content-area">
+            
+        
             @yield('content')
         </div>
     </div>
@@ -154,7 +165,17 @@
                 menu.classList.remove('show');
             }
         });
-    </script>
 
+        // Devices sidebar dropdown
+        document.addEventListener("DOMContentLoaded", function () {
+            const toggle = document.getElementById("devicesSidebarToggle");
+            const menu = document.getElementById("devicesSidebarMenu");
+
+            toggle.addEventListener("click", function (event) {
+                event.preventDefault(); // Prevent navigation
+                menu.style.display = (menu.style.display === "none" ? "block" : "none");
+            });
+        });
+    </script>
 </body>
 </html>
