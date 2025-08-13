@@ -4,8 +4,10 @@
 <div class="container">
     <h2>Router Management</h2>
 
-    @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
+    @if (session('success'))
+        <div class="alert alert-success fade-alert" role="alert">
+            {{ session('success') }}
+        </div>
     @endif
 
     {{-- Create Router Form --}}
@@ -20,8 +22,8 @@
             </div>
 
             @if ($errors->any())
-                <div class="alert alert-danger">
-                    <ul>
+                <div class="alert alert-danger fade-alert" role="alert">
+                    <ul class="mb-0">
                         @foreach ($errors->all() as $error)
                             <li>{{ $error }}</li>
                         @endforeach
@@ -50,44 +52,45 @@
         </thead>
         <tbody>
         @foreach($routers as $router)
-    <tr>
-        {{-- Update Form --}}
-        <form action="{{ route('routers.update', $router->id) }}" method="POST">
-            @csrf
-            @method('PUT')
+        <tr>
+            {{-- Update Form --}}
+            <form action="{{ route('routers.update', $router->id) }}" method="POST">
+                @csrf
+                @method('PUT')
 
-            <td>
-                <input type="text" name="name" value="{{ $router->name }}" class="form-control" readonly>
-            </td>
-            <td>{{ $router->ip_address }}</td>
-            <td>
-                <input type="text" name="label" value="{{ $router->label }}" class="form-control">
-            </td>
-            <td>
-                @if ($router->networks->count())
-                    {{ $router->networks->pluck('name')->join(', ') }}
-                @else
-                    N/A
-                @endif
-            </td>
-            <td>
-                <span id="status-{{ $router->id }}" 
-                    class="badge {{ $router->status === 'online' ? 'bg-success' : 'bg-danger' }}">
-                    {{ $router->status === 'online' ? '🟢 Online' : '🔴 Offline' }}
-                </span>
-            </td>
-            <td>
-                <div class="d-flex gap-1">
-                    <button type="submit" class="btn btn-sm btn-info">Update</button>
-        </form>
+                <td>
+                    <input type="text" name="name" value="{{ $router->name }}" class="form-control" readonly>
+                </td>
+                <td>{{ $router->ip_address }}</td>
+                <td>
+                    <input type="text" name="label" value="{{ $router->label }}" class="form-control">
+                </td>
+                <td>
+                    @if ($router->networks->count())
+                        {{ $router->networks->pluck('name')->join(', ') }}
+                    @else
+                        N/A
+                    @endif
+                </td>
+                <td>
+                    <span id="status-{{ $router->id }}" 
+                        class="badge {{ $router->status === 'online' ? 'bg-success' : 'bg-danger' }}">
+                        {{ $router->status === 'online' ? '🟢 Online' : '🔴 Offline' }}
+                    </span>
+                </td>
+                <td>
+                    <div class="d-flex gap-1">
+                        <button type="submit" class="btn btn-sm btn-info">Update</button>
+            </form>
 
-        {{-- Delete Form --}}
-        <form action="{{ route('routers.destroy', $router->id) }}" method="POST" onsubmit="return confirm('Delete this router?')">
-            @csrf
-            @method('DELETE')
-            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-        </form>
-            </tr>
+            {{-- Delete Form --}}
+            <form action="{{ route('routers.destroy', $router->id) }}" method="POST" onsubmit="return confirm('Delete this router?')">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+            </form>
+            </td>
+        </tr>
         @endforeach
 
         </tbody>
@@ -129,5 +132,15 @@ function refreshStatuses() {
             row.style.display = row.textContent.toLowerCase().includes(filter) ? "" : "none";
         });
     });
+
+    // Flash message auto-hide
+    setTimeout(() => {
+        document.querySelectorAll('.fade-alert').forEach(alert => {
+            alert.style.transition = 'opacity 0.5s ease';
+            alert.style.opacity = '0';
+            setTimeout(() => alert.remove(), 500);
+        });
+    }, 3000);
+
 </script>
 @endsection

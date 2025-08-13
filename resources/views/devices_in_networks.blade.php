@@ -4,14 +4,31 @@
 <div class="container">
     <h2>Devices in {{ $network->name }}</h2>
 
+        @if (session('success'))
+            <div class="alert alert-success fade-alert" role="alert">
+                {{ session('success') }}
+            </div>
+        @endif
+
     <form action="{{ route('network.devices.store', $network->id) }}" method="POST" class="mb-3">
         @csrf
         <label>Select Routers:</label>
         <select name="router_ids[]" multiple class="form-select" required>
             @foreach ($allRouters as $router)
                 <option value="{{ $router->id }}">{{ $router->name }} ({{ $router->ip_address }})</option>
-            @endforeach
+            @endforeach       
         </select>
+
+        @if ($errors->any())
+            <div class="alert alert-danger fade-alert" role="alert">
+                <ul class="mb-0">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
         <button class="btn btn-success mt-2">Add Devices</button>
     </form>
 
@@ -37,8 +54,11 @@
                         @endif
                     </td>
                     <td>
-                        <form action="{{ route('network.devices.destroy', [$network->id, $router->id]) }}" method="POST">
-                            @csrf @method('DELETE')
+                        <form action="{{ route('network.devices.destroy', [$network->id, $router->id]) }}" 
+                            method="POST" 
+                            onsubmit="return confirm('Remove this device from the network?')">
+                            @csrf 
+                            @method('DELETE')
                             <button class="btn btn-warning">Remove</button>
                         </form>
                     </td>
@@ -66,5 +86,15 @@
 
     setInterval(updateStatus, 5000);
     updateStatus();
+
+    // Flash message auto-hide
+    setTimeout(() => {
+        document.querySelectorAll('.fade-alert').forEach(alert => {
+            alert.style.transition = 'opacity 0.5s ease';
+            alert.style.opacity = '0';
+            setTimeout(() => alert.remove(), 500);
+        });
+    }, 3000);
+
 </script>
 @endsection
