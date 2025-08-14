@@ -122,6 +122,7 @@
                 </li>
             @endforeach
         </ul>
+        <a href="{{ url('/standalone_vpn_clients') }}">Standalone VPN Clients</a>
         <a href="{{ url('/administration') }}">Administration</a>
     </div>
 
@@ -145,8 +146,6 @@
         </div>
 
         <div class="content-area">
-            
-        
             @yield('content')
         </div>
     </div>

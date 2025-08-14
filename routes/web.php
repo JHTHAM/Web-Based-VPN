@@ -55,6 +55,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/routers', fn() => view('routers'));
     Route::get('/networks', fn() => view('networks'));
     Route::get('/devices_in_networks', fn() => view('devices_in_networks'));
+    Route::get('/standalone_vpn_clients', fn() => view('standalone_vpn_clients'));
     Route::get('/administration', fn() => view('administration'));
 });
 
