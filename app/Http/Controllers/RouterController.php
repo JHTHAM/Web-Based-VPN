@@ -18,6 +18,9 @@ class RouterController extends Controller
             foreach (explode("\n", $output) as $line) {
                 if (str_starts_with($line, 'CLIENT_LIST')) {
                     $fields = str_getcsv($line);
+
+                    // Only count valid lines where the first field is "CLIENT_LIST"
+                    // and the second field (Common Name) exists
                     if (isset($fields[1]) && $fields[0] === 'CLIENT_LIST') {
                         $clientName = trim($fields[1]);
                         if ($clientName !== '') {
@@ -28,6 +31,7 @@ class RouterController extends Controller
             }
         }
 
+        // Build the statuses array
         $statuses = [];
         foreach (Router::all() as $router) {
             $statuses[$router->id] = in_array($router->name, $activeRouters)
@@ -38,6 +42,7 @@ class RouterController extends Controller
         return response()->json($statuses);
     }
 
+    // show all routers
     public function index()
     {
         $this->fetchStatus();
@@ -45,6 +50,7 @@ class RouterController extends Controller
         return view('routers', compact('routers'));
     }
 
+    // show dashboard
     public function dashboard()
     {
         $this->fetchStatus();
@@ -52,6 +58,7 @@ class RouterController extends Controller
         return view('dashboard', compact('routers'));
     }
 
+    // store a new router
     public function store(Request $request)
     {
         $request->validate([
@@ -60,7 +67,7 @@ class RouterController extends Controller
 
         $name = $request->name;
 
-        // Create DB record
+        // Create router and DB record
         $router = Router::create([
             'name' => $name,
             'ip_address' => null,
@@ -87,6 +94,7 @@ class RouterController extends Controller
             mkdir($localDir, 0755, true);
         }
 
+        // Save result if successful
         if (file_exists($remoteFile)) {
             copy($remoteFile, $localPath);
             $router->ip_address = $assignedIp;
@@ -100,6 +108,7 @@ class RouterController extends Controller
         return redirect()->back()->with('success', 'Router created and .ovpn generated.');
     }
 
+    // delete router
     public function destroy($id)
     {
         $router = Router::findOrFail($id);
@@ -130,6 +139,7 @@ class RouterController extends Controller
         return redirect()->back()->with('success', 'Router updated successfully.');
     }
 
+    // download ovpn
     public function downloadOvpn($id)
     {
         $router = Router::findOrFail($id);
