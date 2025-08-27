@@ -16,14 +16,10 @@ use App\Http\Controllers\NetworkController;
 |
 */
 
+// First land on Login
 Route::get('/', function () {
-    return view('welcome'); 
+    return redirect()->route('login');
 });
-
-Route::get('/error', function () {
-    return "Unknown username. Please contact admin.";
-});
-
 
 // Show login form
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');

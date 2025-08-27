@@ -2,8 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>@yield('title', 'Dashboard')</title>
+    <title>@yield('title', 'Nova+ WebAccess_VPN')</title>
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+    <link rel="icon" type="image/jpeg" href="{{ asset('Image/favicon.jpg') }}">
+    <link href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css" rel="stylesheet">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -14,7 +16,7 @@
         }
 
         .sidebar {
-            width: 230px;
+            width: 240px;
             background: #2c3e50;
             color: #ecf0f1;
             padding: 20px;
@@ -106,11 +108,17 @@
 <body>
     {{-- Sidebar --}}
     <div class="sidebar">
-        <h2>WebBasedVpn</h2>
-        <a href="{{ url('/dashboard') }}">Dashboard</a>
-        <a href="{{ url('/routers') }}">Routers</a>
-        <a href="{{ url('/networks') }}">Networks</a>
+        <div style="text-align: center; margin-bottom: 20px;">
+            <img src="{{ asset('Image/icon.jpg') }}" alt="Logo" 
+                style="width: 90px; height: 90px; border-radius: 50%; margin-bottom: 10px;">
+
+            <h2>WebBasedVpn</h2>
+        </div>
+        <a href="{{ url('/dashboard') }}"><i class="mdi mdi-chart-line"></i> Dashboard</a>
+        <a href="{{ url('/routers') }}"><i class="mdi mdi-lan"></i> Routers</a>
+        <a href="{{ url('/networks') }}"><i class="mdi mdi-access-point-network"></i> Networks</a>
         <a href="#" class="nav-link" id="devicesSidebarToggle">
+            <i class="mdi mdi-lan-connect"></i>
             <span>Devices in Networks ▾</span>
         </a>
         <ul id="devicesSidebarMenu" class="nav flex-column ms-3" style="display: none;">
@@ -122,8 +130,8 @@
                 </li>
             @endforeach
         </ul>
-        <a href="{{ url('/standalone_vpn_clients') }}">Standalone VPN Clients</a>
-        <a href="{{ url('/administration') }}">Administration</a>
+        <a href="{{ url('/standalone_vpn_clients') }}"><i class="mdi mdi-laptop"></i> Standalone VPN Clients</a>
+        <a href="{{ url('/administration') }}"><i class="mdi mdi-account-multiple"></i> Administration</a>
     </div>
 
     {{-- Main content area --}}
@@ -135,10 +143,11 @@
                         {{ Auth::user()->name }} ({{ Auth::user()->username }})
                     </div>
                     <div class="dropdown-menu" id="dropdownMenu">
-                        <a href="{{ url('/profile') }}">Profile</a>
-                        <form method="POST" action="{{ route('logout') }}">
+                        <a href="{{ url('/profile') }}"><i class="mdi mdi-account"></i> Profile</a>
+                        <form method="POST" action="{{ route('logout') }}"
+                            onsubmit="return confirm('Are you sure you want to logout?');">
                             @csrf
-                            <button type="submit">Logout</button>
+                            <button type="submit"><i class="mdi mdi-home-import-outline"></i> Logout</button>
                         </form>
                     </div>
                 </div>

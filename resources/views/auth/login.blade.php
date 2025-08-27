@@ -7,12 +7,26 @@
 </head>
 <body class="bg-light">
 
+@if (session('success'))
+    <div class="alert alert-success fade-alert" role="alert">
+        {{ session('success') }}
+    </div>
+@endif
+
 <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-6">
 
+            <div style="text-align: center">
+                        <img src="{{ asset('Image/icon.jpg') }}" alt="Logo" 
+                            style="width: 120px; height: 100px; border-radius: 50%; margin-bottom: 5px">
+            </div>
+            
             <div class="card shadow">
+                
                 <div class="card-header text-center">
+
+                
                     <h4>Login to VPN Control Dashboard</h4>
                 </div>
 
@@ -66,6 +80,17 @@
         </div>
     </div>
 </div>
+
+<script>
+// Flash message auto-hide
+    setTimeout(() => {
+        document.querySelectorAll('.fade-alert').forEach(alert => {
+            alert.style.transition = 'opacity 0.5s ease';
+            alert.style.opacity = '0';
+            setTimeout(() => alert.remove(), 500);
+        });
+    }, 3000);
+</script>
 
 </body>
 </html>
