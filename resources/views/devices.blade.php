@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container">
-    <h2>📥 Download VPN Profiles</h2>
+    <h2>Overview VPN Profiles</h2>
 
     @if(session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>

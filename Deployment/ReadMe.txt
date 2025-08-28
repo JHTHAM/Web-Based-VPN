@@ -94,3 +94,20 @@ www-data ALL=(utar) NOPASSWD: /opt/shared_vpn/client-configs/generate_ovpn.sh, /
 
 // test manually generate
 sudo -u www-data /opt/shared_vpn/client-configs/generate_ovpn.sh TESTUSER
+
+// if key problems
+cd /var/www/vpn-dashboard
+sudo chown -R www-data:www-data storage bootstrap/cache .env
+sudo chmod -R 775 storage bootstrap/cache
+sudo chmod 664 .env
+
+# Clear Laravel caches
+php artisan config:clear
+php artisan route:clear
+php artisan cache:clear
+php artisan view:clear
+
+# Rebuild config cache cleanly
+php artisan config:cache
+
+php artisan key:generate

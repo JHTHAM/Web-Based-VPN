@@ -32,8 +32,8 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 // Dashboard routes
 Route::middleware('auth')->group(function () {
-    Route::get('/dashboard', function () {
-        return view('dashboard');
+    Route::get('/devices', function () {
+        return view('devices');
     });
 });
 
@@ -47,12 +47,14 @@ Route::get('/reset-session', function () {
 
 // Authentication routes
 Route::middleware(['auth'])->group(function () {
-    Route::get('/dashboard', fn() => view('dashboard'));
-    Route::get('/routers', fn() => view('routers'));
-    Route::get('/networks', fn() => view('networks'));
+    Route::get('/devices', fn() => view('devices'));
     Route::get('/devices_in_networks', fn() => view('devices_in_networks'));
-    Route::get('/standalone_vpn_clients', fn() => view('standalone_vpn_clients'));
-    Route::get('/administration', fn() => view('administration'));
+    Route::get('/routers', fn() => view('routers'));
+    Route::get('/standalone_clients', fn() => view('standalone_clients'));
+    Route::get('/networks', fn() => view('networks'));
+    Route::get('/admin_accounts', fn() => view('admin_accounts'));
+    Route::get('/client_accounts', fn() => view('client_accounts'));
+    Route::get('/profile', fn() => view('profile'));
 });
 
 
@@ -63,7 +65,7 @@ Route::put('/routers/{id}', [RouterController::class, 'update'])->name('routers.
 Route::delete('/routers/{id}', [RouterController::class, 'destroy'])->name('routers.destroy'); // Delete router
 Route::get('/routers/{id}/download', [RouterController::class, 'downloadOvpn'])->name('download.ovpn'); // Download .ovpn
 
-Route::get('/dashboard', [RouterController::class, 'dashboard'])->name('dashboard');
+Route::get('/devices', [RouterController::class, 'dashboard'])->name('devices');
 Route::get('/routers/status', [RouterController::class, 'fetchStatus'])->name('routers.status');
 
 

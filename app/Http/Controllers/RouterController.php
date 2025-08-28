@@ -60,7 +60,7 @@ class RouterController extends Controller
     {
         $this->fetchStatus();
         $routers = Router::all();
-        return view('dashboard', compact('routers'));
+        return view('devices', compact('routers'));
     }
 
     // Store a new router

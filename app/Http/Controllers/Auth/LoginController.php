@@ -33,7 +33,7 @@ class LoginController extends Controller
     {
         $username = auth()->user()->username;
 
-        return '/dashboard';
+        return '/devices';
     }
 
     public function showLoginForm() 
