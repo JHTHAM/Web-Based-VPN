@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateRoutersTable extends Migration
+class CreateStandaloneClientsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,13 @@ class CreateRoutersTable extends Migration
      */
     public function up()
     {
-        Schema::create('routers', function (Blueprint $table) {
+        Schema::create('standalone_clients', function (Blueprint $table) {
             $table->id();
             $table->string('name')->unique();
             $table->string('ip_address')->nullable();
             $table->string('label')->nullable();
             $table->enum('status', ['online', 'offline'])->default('offline');
-            $table->string('ovpn_path')->nullable(); // path to .ovpn file
+            $table->string('ovpn_path')->nullable();
             $table->timestamps();
         });
     }
@@ -31,6 +31,6 @@ class CreateRoutersTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('routers');
+        Schema::dropIfExists('standalone_clients');
     }
 }

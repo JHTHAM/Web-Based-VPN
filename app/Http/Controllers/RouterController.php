@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Router;
+use App\Models\StandaloneClient;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -37,9 +38,17 @@ class RouterController extends Controller
         }
 
         // Build the statuses array
+        // Routers
         $statuses = [];
         foreach (Router::all() as $router) {
-            $statuses[$router->id] = in_array($router->name, $activeRouters)
+            $statuses["router-{$router->id}"] = in_array($router->name, $activeRouters)
+                ? 'online'
+                : 'offline';
+        }
+
+        // Standalone Clients
+        foreach (StandaloneClient::all() as $client) {
+            $statuses["client-{$client->id}"] = in_array($client->name, $activeRouters)
                 ? 'online'
                 : 'offline';
         }
@@ -60,15 +69,32 @@ class RouterController extends Controller
     {
         $this->fetchStatus();
         $routers = Router::all();
-        return view('devices', compact('routers'));
+        $standaloneClients = StandaloneClient::all();
+        return view('devices', compact('routers', 'standaloneClients'));
     }
 
     // Store a new router
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|unique:routers,name',
-        ], ['name.unique' => 'This router name is already taken. Please choose another.']);
+            'name' => [
+                'required',
+                'string',
+                function ($attribute, $value, $fail) {
+                    // Check in routers
+                    if (Router::where('name', $value)->exists()) {
+                        $fail("The $attribute '$value' is already taken (router).");
+                    }
+
+                    // Check in standalone clients
+                    if (StandaloneClient::where('name', $value)->exists()) {
+                        $fail("The $attribute '$value' is already taken (standalone client).");
+                    }
+                },
+            ],
+        ], [
+            'name.required' => 'A name is required.',
+        ]);
 
         $name = $request->name;
 
@@ -81,7 +107,7 @@ class RouterController extends Controller
 
         // Step 2: SSH command to run remote script
         $clientName = escapeshellarg($name);
-        $remoteScript = "bash /opt/shared_vpn/client-configs/generate_ovpn.sh $clientName";
+        $remoteScript = "bash /opt/shared_vpn/client-configs/generate_router_ovpn.sh $clientName";
         $sshCommand = "ssh utar@10.8.0.1 \"$remoteScript\"";
 
         Log::info("Running SSH command: $sshCommand");
@@ -116,7 +142,7 @@ class RouterController extends Controller
             \Log::error("❌ Failed to fetch .ovpn for router: $name");
         }
 
-        return redirect()->back()->with('success', 'Router created and .ovpn generated from remote server.');
+        return redirect()->back()->with('success', 'Router created and .ovpn generated successfully.');
     }
 
     // Delete router
@@ -139,7 +165,7 @@ class RouterController extends Controller
         $router->delete();
 
         // Step 4: Return with status message
-        return redirect()->back()->with('success', "Router '$name' deleted and remote cleanup completed.");
+        return redirect()->back()->with('success', "Router '$name' deleted successfully.");
     }
 
     public function update(Request $request, $id)

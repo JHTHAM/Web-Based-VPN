@@ -42,7 +42,9 @@
                         {{ $network->name }}
                     </a>
                 </td>
-                <td>{{ $network->routers_count }}</td>
+                <td>
+                    {{ $network->routers_count + $network->standalone_clients_count }}
+                </td>
                 <td>
                     {{-- Delete Form --}}
                     <form action="{{ route('networks.destroy', $network->id) }}" method="POST"

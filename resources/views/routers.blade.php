@@ -100,27 +100,27 @@
 {{-- Search and StatusJS --}}
 <script>
 function refreshStatuses() {
-    fetch("{{ route('routers.status') }}")
-        .then(response => response.json())
-        .then(data => {
-            for (const [id, status] of Object.entries(data)) {
-                const badge = document.getElementById(`status-${id}`);
-                if (badge) {
-                    if (status === 'online') {
-                        badge.classList.remove('bg-danger');
-                        badge.classList.add('bg-success');
-                        badge.textContent = '🟢 Online';
-                    } else {
-                        badge.classList.remove('bg-success');
-                        badge.classList.add('bg-danger');
-                        badge.textContent = '🔴 Offline';
+        fetch("{{ route('routers.status') }}")
+            .then(response => response.json())
+            .then(data => {
+                for (const [id, status] of Object.entries(data)) {
+                    const badge = document.getElementById(`status-${id}`);
+                    if (badge) {
+                        if (status === 'online') {
+                            badge.classList.remove('bg-danger');
+                            badge.classList.add('bg-success');
+                            badge.textContent = '🟢 Online';
+                        } else {
+                            badge.classList.remove('bg-success');
+                            badge.classList.add('bg-danger');
+                            badge.textContent = '🔴 Offline';
+                        }
                     }
                 }
-            }
-        })
-        .catch(error => console.error('Status update failed:', error));
+            })
+            .catch(error => console.error('Status update failed:', error));
     }
-
+    
     // Refresh every 5 seconds
     setInterval(refreshStatuses, 5000);
 

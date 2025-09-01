@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>@yield('title', 'Nova+ WebAccess_VPN')</title>
+    <title>@yield('title', 'Nova+ VPN')</title>
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
     <link rel="icon" type="image/jpeg" href="{{ asset('Image/favicon.jpg') }}">
     <link href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css" rel="stylesheet">
@@ -116,8 +116,8 @@
     <div class="sidebar">
         <div style="text-align: center; margin-bottom: 20px;">
             <img src="{{ asset('Image/icon.jpg') }}" alt="Logo" 
-                style="width: 200px; height: 60px; border-radius: 1%; margin-bottom: 10px;">
-            <h2>Nova+ VPN</h2>
+                style="width: 180px; height: 60px; border-radius: 1%; margin-bottom: 10px;">
+            <h2>VPN</h2>
         </div>
 
         {{-- Overview --}}
@@ -219,5 +219,9 @@
             } 
         });
     </script>
+
+    <footer class="text-center py-2 mt-4 text-muted fixed-bottom">
+        Powered by <strong>Novaflow Technology Sdn Bhd</strong>
+    </footer>
 </body>
 </html>
