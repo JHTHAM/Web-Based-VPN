@@ -101,7 +101,7 @@ class RouterController extends Controller
         ]);
 
         $clientName = escapeshellarg($name);
-        $scriptPath = "/opt/shared_vpn/client-configs/generate_ovpn.sh";
+        $scriptPath = "/opt/shared_vpn/client-configs/generate_router_ovpn.sh";
 
         Log::info("Running local script: $scriptPath $clientName");
         $output = shell_exec("sudo -u utar {$scriptPath} {$clientName} 2>&1");
