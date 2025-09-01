@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Router;
+use App\Models\StandaloneClient;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -32,9 +33,17 @@ class RouterController extends Controller
         }
 
         // Build the statuses array
+        // Routers
         $statuses = [];
         foreach (Router::all() as $router) {
-            $statuses[$router->id] = in_array($router->name, $activeRouters)
+            $statuses["router-{$router->id}"] = in_array($router->name, $activeRouters)
+                ? 'online'
+                : 'offline';
+        }
+
+        // Standalone Clients
+        foreach (StandaloneClient::all() as $client) {
+            $statuses["client-{$client->id}"] = in_array($client->name, $activeRouters)
                 ? 'online'
                 : 'offline';
         }
@@ -55,15 +64,32 @@ class RouterController extends Controller
     {
         $this->fetchStatus();
         $routers = Router::all();
-        return view('dashboard', compact('routers'));
+        $standaloneClients = StandaloneClient::all();
+        return view('devices', compact('routers', 'standaloneClients'));
     }
 
     // store a new router
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|unique:routers,name',
-        ], ['name.unique' => 'This router name is already taken. Please choose another.']);
+            'name' => [
+                'required',
+                'string',
+                function ($attribute, $value, $fail) {
+                    // Check in routers
+                    if (Router::where('name', $value)->exists()) {
+                        $fail("The $attribute '$value' is already taken (router).");
+                    }
+
+                    // Check in standalone clients
+                    if (StandaloneClient::where('name', $value)->exists()) {
+                        $fail("The $attribute '$value' is already taken (standalone client).");
+                    }
+                },
+            ],
+        ], [
+            'name.required' => 'A name is required.',
+        ]);
 
         $name = $request->name;
 
@@ -105,7 +131,7 @@ class RouterController extends Controller
             Log::error("❌ Failed to find .ovpn for router: $name");
         }
 
-        return redirect()->back()->with('success', 'Router created and .ovpn generated.');
+        return redirect()->back()->with('success', 'Router created and .ovpn generated successfully.');
     }
 
     // delete router

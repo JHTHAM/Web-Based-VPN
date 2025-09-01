@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Login | VPN Dashboard</title>
+    <title>@yield('title', 'Nova+ VPN | Login')</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
 </head>
 <body class="bg-light">
@@ -19,15 +19,14 @@
 
             <div style="text-align: center">
                         <img src="{{ asset('Image/icon.jpg') }}" alt="Logo" 
-                            style="width: 120px; height: 100px; border-radius: 50%; margin-bottom: 5px">
+                            style="width: 400px; height: 150px; border-radius: 1%; margin-bottom: 5px">
             </div>
             
             <div class="card shadow">
                 
                 <div class="card-header text-center">
-
                 
-                    <h4>Login to VPN Control Dashboard</h4>
+                    <h4>Scalable. Secure. Next-Gen VPN Management.</h4>
                 </div>
 
                 <div class="card-body">

@@ -26,11 +26,5 @@ class DatabaseSeeder extends Seeder
             'email' => 'admin@utar.com.my',
             'password' => Hash::make('2222'),
         ]);
-
-        User::create([
-            'username' => 'admin1',
-            'email' => 'admin1@novaflow.com.my',
-            'password' => Hash::make('3333'),
-        ]);
     }
 }

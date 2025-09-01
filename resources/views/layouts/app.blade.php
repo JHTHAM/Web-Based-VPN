@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>@yield('title', 'Nova+ WebAccess_VPN')</title>
+    <title>@yield('title', 'Nova+ VPN')</title>
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
     <link rel="icon" type="image/jpeg" href="{{ asset('Image/favicon.jpg') }}">
     <link href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css" rel="stylesheet">
@@ -16,7 +16,7 @@
         }
 
         .sidebar {
-            width: 240px;
+            width: 250px;
             background: #2c3e50;
             color: #ecf0f1;
             padding: 20px;
@@ -30,8 +30,14 @@
             border-radius: 4px;
         }
 
-        .sidebar a:hover {
-            background: #34495e;
+        .sidebar > .sidebar-toggle {
+            font-size: 17px;
+
+        }
+
+        .sidebar ul .sidebar-toggle {
+            font-size: 15px;
+            font-weight: normal;
         }
 
         .main-content {
@@ -110,29 +116,59 @@
     <div class="sidebar">
         <div style="text-align: center; margin-bottom: 20px;">
             <img src="{{ asset('Image/icon.jpg') }}" alt="Logo" 
-                style="width: 90px; height: 90px; border-radius: 50%; margin-bottom: 10px;">
-
-            <h2>WebBasedVpn</h2>
+                style="width: 180px; height: 60px; border-radius: 1%; margin-bottom: 10px;">
+            <h2>VPN</h2>
         </div>
-        <a href="{{ url('/dashboard') }}"><i class="mdi mdi-chart-line"></i> Dashboard</a>
-        <a href="{{ url('/routers') }}"><i class="mdi mdi-lan"></i> Routers</a>
-        <a href="{{ url('/networks') }}"><i class="mdi mdi-access-point-network"></i> Networks</a>
-        <a href="#" class="nav-link" id="devicesSidebarToggle">
-            <i class="mdi mdi-lan-connect"></i>
-            <span>Devices in Networks ▾</span>
+
+        {{-- Overview --}}
+        <a href="#" class="nav-link sidebar-toggle" data-target="overviewMenu">
+            <i class="mdi mdi-chart-line"></i>
+            <span>Overview</span>
         </a>
-        <ul id="devicesSidebarMenu" class="nav flex-column ms-3" style="display: none;">
-            @foreach(\App\Models\Network::all() as $network)
-                <li class="nav-item">
-                    <a href="{{ route('network.devices', ['network' => $network->id]) }}" class="nav-link">
-                        {{ $network->name }}
-                    </a>
-                </li>
-            @endforeach
+        <ul id="overviewMenu" class="nav flex-column ms-3" style="display: none;">
+            <li class="nav-item">
+                <a href="{{ url('/devices') }}" class="nav-link">
+                    <i class="mdi mdi-devices"></i> Devices
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link sidebar-toggle" data-target="devicesInNetworksMenu">
+                    <i class="mdi mdi-lan-connect"></i> Devices in Networks ▾
+                </a>
+                <ul id="devicesInNetworksMenu" class="nav flex-column ms-3" style="display: none;">
+                    @foreach(\App\Models\Network::all() as $network)
+                        <li class="nav-item">
+                            <a href="{{ route('network.devices', ['network' => $network->id]) }}" class="nav-link">
+                                {{ $network->name }}
+                            </a>
+                        </li>
+                    @endforeach
+                </ul>
+            </li>
         </ul>
-        <a href="{{ url('/standalone_vpn_clients') }}"><i class="mdi mdi-laptop"></i> Standalone VPN Clients</a>
-        <a href="{{ url('/administration') }}"><i class="mdi mdi-account-multiple"></i> Administration</a>
+
+        {{-- Configuration --}}
+        <a href="#" class="nav-link sidebar-toggle" data-target="configMenu">
+            <i class="mdi mdi-cogs"></i>
+            <span>Configuration</span>
+        </a>
+        <ul id="configMenu" class="nav flex-column ms-3" style="display: none;">
+            <li><a href="{{ url('/routers') }}" class="nav-link"><i class="mdi mdi-lan"></i> Routers</a></li>
+            <li><a href="{{ url('/standalone_clients') }}" class="nav-link"><i class="mdi mdi-laptop"></i> Standalone Clients</a></li>
+            <li><a href="{{ url('/networks') }}" class="nav-link"><i class="mdi mdi-access-point-network"></i> Networks</a></li>
+        </ul>
+
+        {{-- Administration --}}
+        <a href="#" class="nav-link sidebar-toggle" data-target="adminMenu">
+            <i class="mdi mdi-account-multiple"></i>
+            <span>Administration</span>
+        </a>
+        <ul id="adminMenu" class="nav flex-column ms-3" style="display: none;">
+            <li><a href="{{ url('/admin_accounts') }}" class="nav-link"><i class="mdi mdi-account-key"></i> Admin Accounts</a></li>
+            <li><a href="{{ url('/client_accounts') }}" class="nav-link"><i class="mdi mdi-account"></i> Client Accounts</a></li>
+        </ul>
     </div>
+        
 
     {{-- Main content area --}}
     <div class="main-content">
@@ -160,30 +196,32 @@
     </div>
 
     <script>
-        const toggleBtn = document.getElementById('userDropdown');
-        const menu = document.getElementById('dropdownMenu');
-
-        function toggleDropdown() {
-            menu.classList.toggle('show');
-        }
-
-        // Close dropdown when clicking outside
-        document.addEventListener('click', function(e) {
-            if (!toggleBtn.contains(e.target)) {
-                menu.classList.remove('show');
-            }
-        });
-
-        // Devices sidebar dropdown
+        // Dropdown in Sidebar
         document.addEventListener("DOMContentLoaded", function () {
-            const toggle = document.getElementById("devicesSidebarToggle");
-            const menu = document.getElementById("devicesSidebarMenu");
-
-            toggle.addEventListener("click", function (event) {
-                event.preventDefault(); // Prevent navigation
-                menu.style.display = (menu.style.display === "none" ? "block" : "none");
+            document.querySelectorAll(".sidebar-toggle").forEach(toggle => {
+                toggle.addEventListener("click", function (event) {
+                    event.preventDefault();
+                    const targetMenu = document.getElementById(this.dataset.target);
+                    if (targetMenu) {
+                        targetMenu.style.display = (targetMenu.style.display === "none" ? "block" : "none");
+                    }
+                });
             });
         });
+
+        const toggleBtn = document.getElementById('userDropdown'); 
+        const menu = document.getElementById('dropdownMenu'); 
+        function toggleDropdown() { menu.classList.toggle('show'); } 
+        // Close dropdown when clicking outside 
+        document.addEventListener('click', function(e) { 
+            if (!toggleBtn.contains(e.target)) { 
+                menu.classList.remove('show'); 
+            } 
+        });
     </script>
+
+    <footer class="text-center py-2 mt-4 text-muted fixed-bottom">
+        Powered by <strong>Novaflow Technology Sdn Bhd</strong>
+    </footer>
 </body>
 </html>

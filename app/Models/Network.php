@@ -11,4 +11,9 @@ class Network extends Model
     public function routers() {
         return $this->belongsToMany(Router::class, 'network_router');
     }
+
+    public function standaloneClients()
+    {
+        return $this->belongsToMany(StandaloneClient::class, 'network_standalone_client');
+    }
 }

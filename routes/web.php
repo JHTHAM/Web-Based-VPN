@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\RouterController;
 use App\Http\Controllers\NetworkController;
+use App\Http\Controllers\StandaloneClientController;
 
 /*
 |--------------------------------------------------------------------------
@@ -32,8 +33,8 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 // Dashboard routes
 Route::middleware('auth')->group(function () {
-    Route::get('/dashboard', function () {
-        return view('dashboard');
+    Route::get('/devices', function () {
+        return view('devices');
     });
 });
 
@@ -47,12 +48,14 @@ Route::get('/reset-session', function () {
 
 // Authentication routes
 Route::middleware(['auth'])->group(function () {
-    Route::get('/dashboard', fn() => view('dashboard'));
-    Route::get('/routers', fn() => view('routers'));
-    Route::get('/networks', fn() => view('networks'));
+    Route::get('/devices', fn() => view('devices'));
     Route::get('/devices_in_networks', fn() => view('devices_in_networks'));
-    Route::get('/standalone_vpn_clients', fn() => view('standalone_vpn_clients'));
-    Route::get('/administration', fn() => view('administration'));
+    Route::get('/routers', fn() => view('routers'));
+    Route::get('/standalone_clients', fn() => view('standalone_clients'));
+    Route::get('/networks', fn() => view('networks'));
+    Route::get('/admin_accounts', fn() => view('admin_accounts'));
+    Route::get('/client_accounts', fn() => view('client_accounts'));
+    Route::get('/profile', fn() => view('profile'));
 });
 
 
@@ -61,9 +64,9 @@ Route::get('/routers', [RouterController::class, 'index'])->name('routers.index'
 Route::post('/routers', [RouterController::class, 'store'])->name('routers.store');          // Create new router
 Route::put('/routers/{id}', [RouterController::class, 'update'])->name('routers.update');    // Update router
 Route::delete('/routers/{id}', [RouterController::class, 'destroy'])->name('routers.destroy'); // Delete router
-Route::get('/routers/{id}/download', [RouterController::class, 'downloadOvpn'])->name('download.ovpn'); // Download .ovpn
+Route::get('/routers/{id}/download', [RouterController::class, 'downloadOvpn'])->name('router_download.ovpn'); // Download .ovpn
 
-Route::get('/dashboard', [RouterController::class, 'dashboard'])->name('dashboard');
+Route::get('/devices', [RouterController::class, 'dashboard'])->name('devices');
 Route::get('/routers/status', [RouterController::class, 'fetchStatus'])->name('routers.status');
 
 
@@ -77,4 +80,17 @@ Route::post('/networks/{network}/devices', [NetworkController::class, 'addDevice
 Route::delete('/networks/{network}/devices/{router}', [NetworkController::class, 'removeDevice'])->name('network.devices.destroy');
 
 Route::get('/fetch-status', [NetworkController::class, 'fetchStatus']);
+
+Route::post('/networks/{network}/add-standalone', [NetworkController::class, 'addStandaloneDevices'])->name('network.standalone.store');
+Route::delete('/networks/{network}/standalone/{client}', [NetworkController::class, 'removeStandaloneDevice'])->name('network.standalone.destroy');
+
+
+// Standalone Client routes
+Route::get('/standalone_clients', [StandaloneClientController::class, 'index'])->name('standalone_clients.index');
+Route::post('/standalone_clients', [StandaloneClientController::class, 'store'])->name('standalone_clients.store');
+Route::put('/standalone_clients/{id}', [StandaloneClientController::class, 'update'])->name('standalone_clients.update');
+Route::delete('/standalone_clients/{id}', [StandaloneClientController::class, 'destroy'])->name('standalone_clients.destroy');
+Route::get('/standalone_clients/{id}/download', [StandaloneClientController::class, 'downloadOvpn'])->name('client_download.ovpn');
+
+Route::get('/standalone_clients/status', [StandaloneClientController::class, 'fetchStatus'])->name('standalone_clients.status'); // Fetch status using router.status
 
