@@ -12,8 +12,9 @@ class RouterController extends Controller
 {
     public function fetchStatus()
     {
-        $statusFile = '/etc/openvpn/openvpn-status.log';
-        $output = @file_get_contents($statusFile); // Local read instead of SSH
+        $remoteFile = '/etc/openvpn/openvpn-status.log';
+        $sshCommand = "ssh utar@10.8.0.1 \"cat $remoteFile\"";
+        $output = shell_exec($sshCommand);
 
         $activeRouters = [];
         if ($output) {
@@ -52,7 +53,7 @@ class RouterController extends Controller
         return response()->json($statuses);
     }
 
-    // show all routers
+    // Show all routers
     public function index()
     {
         $this->fetchStatus();
@@ -60,7 +61,7 @@ class RouterController extends Controller
         return view('routers', compact('routers'));
     }
 
-    // show dashboard
+    // Show dashboard
     public function dashboard()
     {
         $this->fetchStatus();
@@ -69,7 +70,7 @@ class RouterController extends Controller
         return view('devices', compact('routers', 'standaloneClients'));
     }
 
-    // store a new router
+    // Store a new router
     public function store(Request $request)
     {
         $request->validate([
@@ -79,78 +80,89 @@ class RouterController extends Controller
                 function ($attribute, $value, $fail) {
                     // Check in routers
                     if (Router::where('name', $value)->exists()) {
-                        $fail("The $attribute '$value' is already taken (router).");
+                        $fail("The $attribute '$value' is already taken (router)!");
                     }
 
                     // Check in standalone clients
                     if (StandaloneClient::where('name', $value)->exists()) {
-                        $fail("The $attribute '$value' is already taken (standalone client).");
+                        $fail("The $attribute '$value' is already taken (standalone client)!");
                     }
                 },
             ],
         ], [
-            'name.required' => 'A name is required.',
+            'name.required' => 'A name is required!',
         ]);
 
         $name = $request->name;
 
-        // Create router and DB record
+        // Step 1: Create router record
         $router = Router::create([
             'name' => $name,
             'ip_address' => null,
             'status' => 'offline',
         ]);
 
+        // Step 2: SSH command to run remote script
         $clientName = escapeshellarg($name);
-        $scriptPath = "/opt/shared_vpn/client-configs/generate_router_ovpn.sh";
+        $remoteScript = "bash /opt/shared_vpn/client-configs/generate_router_ovpn.sh $clientName";
+        $sshCommand = "ssh utar@10.8.0.1 \"$remoteScript\"";
 
-        Log::info("Running local script: $scriptPath $clientName");
-        $output = shell_exec("sudo -u utar {$scriptPath} {$clientName} 2>&1");
-        Log::info("Script output: $output");
+        Log::info("Running SSH command: $sshCommand");
+        $sshOutput = shell_exec($sshCommand);
+        Log::info("SSH Output: $sshOutput");
 
-        // Assigned IP should be last line of script output
-        $lines = explode("\n", trim($output));
+        // Extract the assigned IP (last line of output)
+        $lines = explode("\n", trim($sshOutput));
         $assignedIp = end($lines);
 
-        // Copy generated file to Laravel storage
-        $remoteFile = "/opt/shared_vpn/client-configs/files/{$name}.ovpn";
+        // Step 3: SCP back .ovpn file from remote server
+        $remoteFile = "utar@10.8.0.1:/opt/shared_vpn/client-configs/files/{$name}.ovpn";
         $localDir = storage_path('app/ovpn');
-        $localPath = "{$localDir}/{$name}.ovpn";
+        $localPath = "$localDir/{$name}.ovpn";
 
         if (!file_exists($localDir)) {
             mkdir($localDir, 0755, true);
         }
 
-        // Save result if successful
-        if (file_exists($remoteFile)) {
-            copy($remoteFile, $localPath);
+        $scpCommand = "scp $remoteFile \"$localPath\"";
+        \Log::info("Running SCP Command: $scpCommand");
+        $scpOutput = shell_exec($scpCommand);
+        \Log::info("SCP Output: " . $scpOutput);
+
+        // Step 4: Save result if successful
+        if (file_exists($localPath)) {
             $router->ip_address = $assignedIp;
             $router->ovpn_path = $localPath;
             $router->save();
-            Log::info("✅ .ovpn fetched and saved for router: $name");
+            \Log::info("✅ .ovpn fetched and saved for router: $name");
         } else {
-            Log::error("❌ Failed to find .ovpn for router: $name");
+            \Log::error("❌ Failed to fetch .ovpn for router: $name");
         }
 
-        return redirect()->back()->with('success', 'Router created and .ovpn generated successfully.');
+        return redirect()->back()->with('success', 'Router created and .ovpn generated successfully!');
     }
 
-    // delete router
+    // Delete router
     public function destroy($id)
     {
         $router = Router::findOrFail($id);
         $name = $router->name;
 
+        // Step 1: Build remote script command
         $clientName = escapeshellarg($name);
-        $deleteScript = "/opt/shared_vpn/client-configs/delete_ovpn.sh";
+        $remoteScript = "bash /opt/shared_vpn/client-configs/delete_ovpn.sh $clientName";
+        $sshCommand = "ssh utar@10.8.0.1 \"$remoteScript\"";
 
-        Log::info("Running local delete script: $deleteScript $clientName");
-        $output = shell_exec("sudo -u utar {$deleteScript} {$clientName} 2>&1");
-        Log::info("Delete output: $output");
+        // Step 2: Run SSH command and capture output
+        \Log::info("Running SSH command for deletion: $sshCommand");
+        $sshOutput = shell_exec($sshCommand);
+        \Log::info("Delete SSH Output for $name: $sshOutput");
 
+        // Step 3: Delete router from database after remote deletion
         $router->delete();
 
-        return redirect()->back()->with('success', "Router '$name' deleted and cleanup completed.");
+        // Step 4: Return with status message
+        return redirect()->back()->with('success', "Router '$name' deleted successfully!");
     }
 
     public function update(Request $request, $id)
@@ -160,13 +172,13 @@ class RouterController extends Controller
         ]);
 
         $router = Router::findOrFail($id);
-        $router->label = $request->label ?? '';
+        $router->label = $request->label ?? ''; 
         $router->save();
 
-        return redirect()->back()->with('success', 'Router updated successfully.');
+        return redirect()->back()->with('success', 'Router updated successfully!');
     }
 
-    // download ovpn
+    // Download OVPN
     public function downloadOvpn($id)
     {
         $router = Router::findOrFail($id);
