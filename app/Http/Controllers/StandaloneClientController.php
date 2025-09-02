@@ -57,12 +57,12 @@ class StandaloneClientController extends Controller
                 function ($attribute, $value, $fail) {
                     // Check in routers
                     if (Router::where('name', $value)->exists()) {
-                        $fail("The $attribute '$value' is already taken (router).");
+                        $fail("The $attribute '$value' is already taken (router)!");
                     }
 
                     // Check in standalone clients
                     if (StandaloneClient::where('name', $value)->exists()) {
-                        $fail("The $attribute '$value' is already taken (standalone client).");
+                        $fail("The $attribute '$value' is already taken (standalone client)!");
                     }
                 },
             ],
@@ -111,7 +111,7 @@ class StandaloneClientController extends Controller
             Log::error("❌ Failed to fetch .ovpn for standalone client: $name");
         }
 
-        return redirect()->back()->with('success', 'Standalone client created and .ovpn generated successfully.');
+        return redirect()->back()->with('success', 'Standalone client created and .ovpn generated successfully!');
     }
 
     public function destroy($id)
@@ -129,7 +129,7 @@ class StandaloneClientController extends Controller
 
         $client->delete();
 
-        return redirect()->back()->with('success', "Standalone client '$name' deleted successfully.");
+        return redirect()->back()->with('success', "Standalone client '$name' deleted successfully!");
     }
 
     public function update(Request $request, $id)
@@ -142,7 +142,7 @@ class StandaloneClientController extends Controller
         $client->label = $request->label ?? '';
         $client->save();
 
-        return redirect()->back()->with('success', 'Standalone client updated successfully.');
+        return redirect()->back()->with('success', 'Standalone client updated successfully!');
     }
 
     public function downloadOvpn($id)

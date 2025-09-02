@@ -80,17 +80,17 @@ class RouterController extends Controller
                 function ($attribute, $value, $fail) {
                     // Check in routers
                     if (Router::where('name', $value)->exists()) {
-                        $fail("The $attribute '$value' is already taken (router).");
+                        $fail("The $attribute '$value' is already taken (router)!");
                     }
 
                     // Check in standalone clients
                     if (StandaloneClient::where('name', $value)->exists()) {
-                        $fail("The $attribute '$value' is already taken (standalone client).");
+                        $fail("The $attribute '$value' is already taken (standalone client)!");
                     }
                 },
             ],
         ], [
-            'name.required' => 'A name is required.',
+            'name.required' => 'A name is required!',
         ]);
 
         $name = $request->name;
@@ -139,7 +139,7 @@ class RouterController extends Controller
             \Log::error("❌ Failed to fetch .ovpn for router: $name");
         }
 
-        return redirect()->back()->with('success', 'Router created and .ovpn generated successfully.');
+        return redirect()->back()->with('success', 'Router created and .ovpn generated successfully!');
     }
 
     // Delete router
@@ -162,7 +162,7 @@ class RouterController extends Controller
         $router->delete();
 
         // Step 4: Return with status message
-        return redirect()->back()->with('success', "Router '$name' deleted successfully.");
+        return redirect()->back()->with('success', "Router '$name' deleted successfully!");
     }
 
     public function update(Request $request, $id)
@@ -175,7 +175,7 @@ class RouterController extends Controller
         $router->label = $request->label ?? ''; 
         $router->save();
 
-        return redirect()->back()->with('success', 'Router updated successfully.');
+        return redirect()->back()->with('success', 'Router updated successfully!');
     }
 
     // Download OVPN

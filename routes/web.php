@@ -5,6 +5,8 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\RouterController;
 use App\Http\Controllers\NetworkController;
 use App\Http\Controllers\StandaloneClientController;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\ProfileController;
 
 /*
 |--------------------------------------------------------------------------
@@ -93,4 +95,17 @@ Route::delete('/standalone_clients/{id}', [StandaloneClientController::class, 'd
 Route::get('/standalone_clients/{id}/download', [StandaloneClientController::class, 'downloadOvpn'])->name('client_download.ovpn');
 
 Route::get('/standalone_clients/status', [StandaloneClientController::class, 'fetchStatus'])->name('standalone_clients.status'); // Fetch status using router.status
+
+
+// Admin routes
+Route::get('/admin_accounts', [AdminController::class, 'index'])->name('admin_accounts');
+Route::post('/admin_accounts/users', [AdminController::class, 'store'])->name('admin_accounts.store');
+
+// Profile routes
+Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
+Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+Route::put('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
+
+Route::get('/profile/password', [ProfileController::class, 'editPassword'])->name('profile.password.edit');
+Route::post('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
 
