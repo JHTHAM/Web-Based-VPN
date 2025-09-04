@@ -20,7 +20,7 @@ class RedirectIfAuthenticated
     public function handle(Request $request, Closure $next, ...$guards)
     {
         if (Auth::check()) {
-            return redirect('/dashboard');
+            return redirect('/devices');
         }
 
         return $next($request);

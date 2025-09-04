@@ -1,75 +1,79 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="d-flex justify-content-center align-items-center" style="min-height: 80vh;">
-    <div class="card shadow-lg border-0 rounded-4 p-4" style="width: 500px; background: #ffffff;">
-
-        <div class="text-center mb-4">
-            <i class="bi bi-person-circle text-dark" style="font-size: 3rem;"></i>
-            <h3 class="mt-2 text-dark">Create New User</h3>
-            <p class="text-muted mb-0">Fill in the details below to create a new user account</p>
+<div class="container my-5">
+    <div class="card shadow-lg border-0 rounded-4">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">All Users</h4>
+            <a href="{{ route('admin_accounts.create') }}" class="btn btn-light btn-sm fw-bold">
+                <i class="bi bi-person-plus"></i> Create User
+            </a>
         </div>
 
-        @if (session('success'))
-            <div class="alert alert-success fade-alert" role="alert">
-                {{ session('success') }}
-            </div>
-        @endif
+        <div class="card-body">
+            {{-- Success & Error Messages --}}
+            @if (session('success'))
+                <div class="alert alert-success fade-alert" role="alert">
+                    {{ session('success') }}
+                </div>
+            @endif
 
-        @if ($errors->any())
-            <div class="alert alert-danger fade-alert mt-2" role="alert">
-                <ul class="mb-0">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
+            @if (session('error'))
+                <div class="alert alert-danger fade-alert" role="alert">
+                    {{ session('error') }}
+                </div>
+            @endif
 
-        {{-- Create User Form --}}
-        <form action="{{ route('admin_accounts.store') }}" method="POST">
-            @csrf
-            @method('POST')
+            @if ($errors->any())
+                <div class="alert alert-danger fade-alert mt-2" role="alert">
+                    <ul class="mb-0">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
 
-            <div class="mb-3">
-                <label for="username">Username</label>
-                <input type="text" name="username" class="form-control" required value="{{ old('username') }}">
+            {{-- Users Table --}}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Company</th>
+                            <th>Role</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($users as $user)
+                            <tr>
+                                <td>{{ $user->username }}</td>
+                                <td>{{ $user->email }}</td>
+                                <td>{{ $user->company_name }}</td>
+                                <td>
+                                    <span class="badge bg-info text-dark">
+                                        {{ ucfirst($user->role) }}
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <form action="{{ route('admin_accounts.destroy', $user->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Delete this user?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button class="btn btn-danger btn-sm">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="5" class="text-center text-muted">No users found.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
-
-            <div class="mb-3">
-                <label for="email">Email</label>
-                <input type="email" name="email" class="form-control" required value="{{ old('email') }}">
-            </div>
-
-            <div class="mb-3">
-                <label for="company_name">Company Name</label>
-                <input type="text" name="company_name" class="form-control" required value="{{ old('company_name') }}">
-            </div>
-
-            <div class="mb-3">
-                <label for="company_address">Company Address</label>
-                <input type="text" name="company_address" class="form-control" required value="{{ old('company_address') }}">
-            </div>
-
-            <div class="mb-3">
-                <label for="password">Password</label>
-                <input type="password" name="password" class="form-control" required>
-            </div>
-
-            <div class="mb-3">
-                <label for="password_confirmation">Confirm Password</label>
-                <input type="password" name="password_confirmation" class="form-control" required>
-            </div>
-
-            <div class="d-flex gap-2 mt-4">
-                <a href="{{ route('admin_accounts') }}" class="btn btn-outline-secondary w-50 fw-bold rounded-3">
-                    <i class="bi bi-x-circle"></i> Cancel
-                </a>
-                <button type="submit" class="btn btn-primary w-50 fw-bold rounded-3 shadow-sm">
-                    <i class="bi bi-check2-circle"></i> Create User
-                </button>
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 

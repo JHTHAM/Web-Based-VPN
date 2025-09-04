@@ -30,14 +30,10 @@
                 </div>
 
                 <div class="card-body">
-                    @if(session('error'))
-                        <div class="alert alert-danger">{{ session('error') }}</div>
-                    @endif
-
-                    @if($errors->any())
-                        <div class="alert alert-danger">
+                    @if ($errors->any())
+                        <div class="alert alert-danger fade-alert mt-2" role="alert">
                             <ul class="mb-0">
-                                @foreach($errors->all() as $error)
+                                @foreach ($errors->all() as $error)
                                     <li>{{ $error }}</li>
                                 @endforeach
                             </ul>

@@ -20,6 +20,7 @@ class CreateUsersTable extends Migration
             $table->string('password');
             $table->string('company_name')->nullable();
             $table->text('company_address')->nullable();
+            $table->enum('role', ['superadmin', 'admin', 'client'])->default('client');
             $table->timestamps();
         });
     }

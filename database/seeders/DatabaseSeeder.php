@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('1111'),
             'company_name' => 'NovaFlow Sdn Bhd',
             'company_address' => '30, Jalan Serendah 26/41, Seksyen 26, 40400 Shah Alam, Selangor, Malaysia.',
+            'role' => 'superadmin',
         ]);
 
         User::create([
@@ -29,6 +30,7 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('2222'),
             'company_name' => 'UTAR',
             'company_address' => 'Jalan Sungai Long, Bandar Sungai Long, 43000 Kajang, Selangor',
+            'role' => 'admin',
         ]);
     }
 }
