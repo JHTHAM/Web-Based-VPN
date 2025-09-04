@@ -98,8 +98,10 @@ Route::get('/standalone_clients/status', [StandaloneClientController::class, 'fe
 
 
 // Admin routes
-Route::get('/admin_accounts', [AdminController::class, 'index'])->name('admin_accounts');
-Route::post('/admin_accounts/users', [AdminController::class, 'store'])->name('admin_accounts.store');
+Route::get('/admin_accounts', [AdminController::class, 'index'])->name('admin_accounts.index'); // Show all users
+Route::get('/create_user', [AdminController::class, 'create'])->name('admin_accounts.create'); // Create new user
+Route::post('/admin_accounts', [AdminController::class, 'store'])->name('admin_accounts.store'); // Store User
+Route::delete('/admin_accounts/{user}', [AdminController::class, 'destroy'])->name('admin_accounts.destroy'); // Delete User
 
 // Profile routes
 Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
