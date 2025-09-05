@@ -45,6 +45,17 @@ class NetworkController extends Controller
         ]);
     }
 
+    public function networkDevices(Network $network)
+    {
+        $allRouters = Router::all();
+        $allStandaloneClients = StandaloneClient::all();
+        return view('network_devices', [
+            'network' => $network->load(['routers', 'standaloneClients']),
+            'allRouters' => $allRouters,
+            'allStandaloneClients' => $allStandaloneClients,
+        ]);
+    }
+
     public function fetchStatus()
     {
         $remoteFile = '/etc/openvpn/openvpn-status.log';
@@ -97,14 +108,14 @@ class NetworkController extends Controller
         ]], ['router_ids.required' => 'Please select at least one router.']);
 
         $network->routers()->syncWithoutDetaching($request->router_ids);
-        return redirect()->route('network.devices', $network->id)->with('success', 'Router added successfully!');
+        return redirect()->route('network.networkDevices', $network->id)->with('success', 'Router added successfully!');
     }
 
     // Remove a device from the network
     public function removeDevice(Network $network, Router $router)
     {
         $network->routers()->detach($router->id);
-        return redirect()->route('network.devices', $network->id)->with('success', 'Router removed successfully!');
+        return redirect()->route('network.networkDevices', $network->id)->with('success', 'Router removed successfully!');
     }
 
     // Add standalone clients to a network
@@ -125,13 +136,13 @@ class NetworkController extends Controller
         ]);
 
         $network->standaloneClients()->syncWithoutDetaching($request->client_ids);
-        return redirect()->route('network.devices', $network->id)->with('success', 'Standalone client added successfully!');
+        return redirect()->route('network.networkDevices', $network->id)->with('success', 'Standalone client added successfully!');
     }
 
     // Remove standalone client from the network 
     public function removeStandaloneDevice(Network $network, StandaloneClient $client)
     {
         $network->standaloneClients()->detach($client->id);
-        return redirect()->route('network.devices', $network->id)->with('success', 'Standalone client removed successfully!');
+        return redirect()->route('network.networkDevices', $network->id)->with('success', 'Standalone client removed successfully!');
     }
 }

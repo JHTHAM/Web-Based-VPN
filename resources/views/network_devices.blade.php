@@ -4,8 +4,52 @@
 <div class="container">
     <h2>Devices in {{ $network->name }}</h2>
 
+        @if (session('success'))
+            <div class="alert alert-success fade-alert" role="alert">
+                {{ session('success') }}
+            </div>
+        @endif
+
+        @if ($errors->any())
+            <div class="alert alert-danger fade-alert mt-2" role="alert">
+                <ul class="mb-0">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+    <div class="d-flex gap-4">
+        {{-- Router Form --}}
+        <form action="{{ route('network.devices.store', $network->id) }}" method="POST" class="flex-fill">
+            @csrf
+            <label>Select Routers:</label>
+            <select name="router_ids[]" multiple class="form-select" required>
+                @foreach ($allRouters as $router)
+                    <option value="{{ $router->id }}">{{ $router->name }} ({{ $router->ip_address }})</option>
+                @endforeach       
+            </select>
+
+            <button class="btn btn-success mt-2">Add Device</button>
+        </form>
+
+        {{-- Standalone Client Form --}}
+        <form action="{{ route('network.standalone.store', $network->id) }}" method="POST" class="flex-fill">
+            @csrf
+            <label>Select Standalone Clients:</label>
+            <select name="client_ids[]" multiple class="form-select" required>
+                @foreach ($allStandaloneClients as $client)
+                    <option value="{{ $client->id }}">{{ $client->name }} ({{ $client->ip_address }})</option>
+                @endforeach
+            </select>
+
+            <button class="btn btn-success mt-2">Add Device</button>
+        </form>
+    </div>
+
     {{-- Router Table --}}
-    <table class="table mt-4">
+    <table class="table mt-5">
         <colgroup>
             <col style="width: 30%;">
             <col style="width: 25%;">
@@ -32,8 +76,14 @@
                             <span class="badge bg-danger">🔴 Offline</span>
                         @endif
                     </td>
-                    <td class="text">
-                        <span class="text-muted">N/A</span>
+                    <td>
+                        <form action="{{ route('network.devices.destroy', [$network->id, $router->id]) }}" 
+                            method="POST" 
+                            onsubmit="return confirm('Remove this device from the network?')">
+                            @csrf 
+                            @method('DELETE')
+                            <button class="btn btn-warning">Remove</button>
+                        </form>
                     </td>
                 </tr>
             @endforeach
@@ -68,8 +118,14 @@
                             <span class="badge bg-danger">🔴 Offline</span>
                         @endif
                     </td>
-                    <td class="text">
-                        <span class="text-muted">N/A</span>
+                    <td>
+                        <form action="{{ route('network.standalone.destroy', [$network->id, $client->id]) }}" 
+                            method="POST" 
+                            onsubmit="return confirm('Remove this device from the network?')">
+                            @csrf 
+                            @method('DELETE')
+                            <button class="btn btn-warning">Remove</button>
+                        </form>
                     </td>
                 </tr>
             @endforeach
@@ -95,6 +151,15 @@
 
     setInterval(updateStatus, 5000);
     updateStatus();
+
+    // Flash message auto-hide
+    setTimeout(() => {
+        document.querySelectorAll('.fade-alert').forEach(alert => {
+            alert.style.transition = 'opacity 0.5s ease';
+            alert.style.opacity = '0';
+            setTimeout(() => alert.remove(), 500);
+        });
+    }, 3000);
 
 </script>
 @endsection
