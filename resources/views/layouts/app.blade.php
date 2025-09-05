@@ -118,6 +118,11 @@
             font-weight: bold;
             color: #0a58ca !important; /* darker primary */
         }
+        .disabled-link {
+            pointer-events: none;  /* disable clicking */
+            opacity: 0.5;          /* fade look */
+            cursor: not-allowed;   /* show "forbidden" cursor */
+        }
     </style>
 </head>
 <body>
@@ -129,7 +134,7 @@
             <h2>VPN</h2>
         </div>
 
-        {{-- Overview --}}
+        {{-- Overview (everyone can see) --}}
         <a href="#" class="nav-link sidebar-toggle {{ request()->is('devices') || request()->is('networks/*/devices') ? 'active-parent' : '' }}"
         data-target="overviewMenu">
             <i class="mdi mdi-chart-line"></i>
@@ -137,16 +142,11 @@
         </a>
         <ul id="overviewMenu" class="nav flex-column ms-3"
             style="display: {{ request()->is('devices') || request()->is('networks/*/devices') ? 'block' : 'none' }};">
-            
-            {{-- Devices --}}
             <li class="nav-item">
-                <a href="{{ url('/devices') }}"
-                class="nav-link {{ request()->is('devices') ? 'active' : '' }}">
+                <a href="{{ url('/devices') }}" class="nav-link {{ request()->is('devices') ? 'active' : '' }}">
                     <i class="mdi mdi-devices"></i> Devices
                 </a>
             </li>
-
-            {{-- Devices in Networks --}}
             <li class="nav-item">
                 <a href="#" class="nav-link sidebar-toggle {{ request()->is('networks/*/devices') ? 'active-parent' : '' }}"
                 data-target="devicesInNetworksMenu">
@@ -166,8 +166,7 @@
             </li>
         </ul>
 
-
-        {{-- Configuration --}}
+        {{-- Configuration (visible to everyone, clickable only if admin/superadmin) --}}
         <a href="#" class="nav-link sidebar-toggle {{ request()->is('routers') || request()->is('standalone_clients') || request()->is('networks') || request()->is('networks/*/network_devices') ? 'active-parent' : '' }}"
         data-target="configMenu">
             <i class="mdi mdi-cogs"></i>
@@ -175,43 +174,63 @@
         </a>
         <ul id="configMenu" class="nav flex-column ms-3"
             style="display: {{ request()->is('routers') || request()->is('standalone_clients') || request()->is('networks') || request()->is('networks/*/network_devices') ? 'block' : 'none' }};">
-
             <li>
-                <a href="{{ url('/routers') }}" class="nav-link {{ request()->is('routers') ? 'active' : '' }}">
-                    <i class="mdi mdi-lan"></i> Routers
-                </a>
+                @if(in_array(Auth::user()->role, ['superadmin', 'admin']))
+                    <a href="{{ url('/routers') }}" class="nav-link {{ request()->is('routers') ? 'active' : '' }}">
+                        <i class="mdi mdi-lan"></i> Routers
+                    </a>
+                @else
+                    <a href="javascript:void(0)" class="nav-link disabled-link">
+                        <i class="mdi mdi-lan"></i> Routers
+                    </a>
+                @endif
             </li>
             <li>
-                <a href="{{ url('/standalone_clients') }}" class="nav-link {{ request()->is('standalone_clients') ? 'active' : '' }}">
-                    <i class="mdi mdi-laptop"></i> Standalone Clients
-                </a>
+                @if(in_array(Auth::user()->role, ['superadmin','admin']))
+                    <a href="{{ url('/standalone_clients') }}" class="nav-link {{ request()->is('standalone_clients') ? 'active' : '' }}">
+                        <i class="mdi mdi-laptop"></i> Standalone Clients
+                    </a>
+                @else
+                    <a href="javascript:void(0)" class="nav-link disabled-link">
+                        <i class="mdi mdi-laptop"></i> Standalone Clients
+                    </a>
+                @endif
             </li>
             <li>
-                <a href="{{ url('/networks') }}" class="nav-link {{ request()->is('networks') ? 'active' : '' }}">
-                    <i class="mdi mdi-access-point-network"></i> Networks
-                </a>
+                @if(in_array(Auth::user()->role, ['superadmin','admin']))
+                    <a href="{{ url('/networks') }}" class="nav-link {{ request()->is('networks') ? 'active' : '' }}">
+                        <i class="mdi mdi-access-point-network"></i> Networks
+                    </a>
+                @else
+                    <a href="javascript:void(0)" class="nav-link disabled-link">
+                        <i class="mdi mdi-access-point-network"></i> Networks
+                    </a>
+                @endif
             </li>
-
-            {{-- Network Devices --}}
             <li class="nav-item">
-                <a href="#" class="nav-link sidebar-toggle {{ request()->is('networks/*/network_devices') ? 'active-parent' : '' }}"
-                data-target="networkDevicesMenu">
-                    <i class="mdi mdi-lan-connect"></i> Network Devices ▾
-                </a>
-                <ul id="networkDevicesMenu" class="nav flex-column ms-3"
-                    style="display: {{ request()->is('networks/*/network_devices') ? 'block' : 'none' }};">
-                    @foreach(\App\Models\Network::all() as $network)
-                        <li class="nav-item">
-                            <a href="{{ route('network.networkDevices', ['network' => $network->id]) }}"
-                            class="nav-link {{ request()->is('networks/'.$network->id.'/network_devices') ? 'active' : '' }}">
-                                {{ $network->name }}
-                            </a>
-                        </li>
-                    @endforeach
-                </ul>
+                @if(in_array(Auth::user()->role, ['superadmin','admin']))
+                    <a href="#" class="nav-link sidebar-toggle {{ request()->is('networks/*/network_devices') ? 'active-parent' : '' }}"
+                    data-target="networkDevicesMenu">
+                        <i class="mdi mdi-lan-connect"></i> Network Devices ▾
+                    </a>
+                    <ul id="networkDevicesMenu" class="nav flex-column ms-3"
+                        style="display: {{ request()->is('networks/*/network_devices') ? 'block' : 'none' }};">
+                        @foreach(\App\Models\Network::all() as $network)
+                            <li class="nav-item">
+                                <a href="{{ route('network.networkDevices', ['network' => $network->id]) }}"
+                                class="nav-link {{ request()->is('networks/'.$network->id.'/network_devices') ? 'active' : '' }}">
+                                    {{ $network->name }}
+                                </a>
+                            </li>
+                        @endforeach
+                    </ul>
+                @else
+                    <a href="javascript:void(0)" class="nav-link disabled-link">
+                        <i class="mdi mdi-lan-connect"></i> Network Devices ▾
+                    </a>
+                @endif
             </li>
         </ul>
-
 
         {{-- Administration --}}
         <a href="#" class="nav-link sidebar-toggle {{ request()->is('admin_accounts') || request()->is('client_accounts') ? 'active-parent' : '' }}"
@@ -233,7 +252,6 @@
             </li>
         </ul>
     </div>
-        
 
     {{-- Main content area --}}
     <div class="main-content">

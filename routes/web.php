@@ -52,10 +52,16 @@ Route::get('/reset-session', function () {
 Route::middleware(['auth'])->group(function () {
     Route::get('/devices', fn() => view('devices'));
     Route::get('/devices_in_networks', fn() => view('devices_in_networks'));
+});
+
+Route::middleware(['auth','role:superadmin,admin'])->group(function () {
     Route::get('/routers', fn() => view('routers'));
     Route::get('/standalone_clients', fn() => view('standalone_clients'));
     Route::get('/networks', fn() => view('networks'));
     Route::get('/network_devices', fn() => view('network_devices'));
+});
+
+Route::middleware(['auth'])->group(function () {
     Route::get('/admin_accounts', fn() => view('admin_accounts'));
     Route::get('/client_accounts', fn() => view('client_accounts'));
     Route::get('/profile', fn() => view('profile'));
