@@ -12,9 +12,8 @@ class StandaloneClientController extends Controller
 {
     public function fetchStatus()
     {
-        $remoteFile = '/etc/openvpn/openvpn-status.log';
-        $sshCommand = "ssh utar@10.8.0.1 \"cat $remoteFile\"";
-        $output = shell_exec($sshCommand);
+        $statusFile = '/etc/openvpn/openvpn-status.log';
+        $output = @file_get_contents($statusFile); // Local read instead of SSH
 
         $activeClients = [];
         if ($output) {
@@ -78,31 +77,26 @@ class StandaloneClientController extends Controller
             'status'     => 'offline',
         ]);
 
-        $clientName   = escapeshellarg($name);
-        $remoteScript = "bash /opt/shared_vpn/client-configs/generate_client_ovpn.sh $clientName";
-        $sshCommand   = "ssh utar@10.8.0.1 \"$remoteScript\"";
+        $clientName = escapeshellarg($name);
+        $scriptPath = "/opt/shared_vpn/client-configs/generate_client_ovpn.sh";
 
-        Log::info("Running SSH command: $sshCommand");
-        $sshOutput = shell_exec($sshCommand);
-        Log::info("SSH Output: $sshOutput");
+        Log::info("Running local script: $scriptPath $clientName");
+        $output = shell_exec("sudo -u utar {$scriptPath} {$clientName} 2>&1");
+        Log::info("Script output: $output");
 
         $lines = explode("\n", trim($sshOutput));
         $assignedIp = end($lines);
 
-        $remoteFile = "utar@10.8.0.1:/opt/shared_vpn/client-configs/files/{$name}.ovpn";
-        $localDir   = storage_path('app/ovpn');
-        $localPath  = "$localDir/{$name}.ovpn";
+        $remoteFile = "/opt/shared_vpn/client-configs/files/{$name}.ovpn";
+        $localDir = storage_path('app/ovpn');
+        $localPath = "{$localDir}/{$name}.ovpn";
 
         if (!file_exists($localDir)) {
             mkdir($localDir, 0755, true);
         }
 
-        $scpCommand = "scp $remoteFile \"$localPath\"";
-        Log::info("Running SCP Command: $scpCommand");
-        $scpOutput = shell_exec($scpCommand);
-        Log::info("SCP Output: " . $scpOutput);
-
-        if (file_exists($localPath)) {
+        if (file_exists($remoteFile)) {
+            copy($remoteFile, $localPath);
             $client->ip_address = $assignedIp;
             $client->ovpn_path  = $localPath;
             $client->save();
@@ -119,13 +113,12 @@ class StandaloneClientController extends Controller
         $client = StandaloneClient::findOrFail($id);
         $name   = $client->name;
 
-        $clientName   = escapeshellarg($name);
-        $remoteScript = "bash /opt/shared_vpn/client-configs/delete_ovpn.sh $clientName";
-        $sshCommand   = "ssh utar@10.8.0.1 \"$remoteScript\"";
-
-        Log::info("Running SSH command for deletion: $sshCommand");
-        $sshOutput = shell_exec($sshCommand);
-        Log::info("Delete SSH Output for $name: $sshOutput");
+        $clientName = escapeshellarg($name);
+        $deleteScript = "/opt/shared_vpn/client-configs/delete_ovpn.sh";
+        
+        LLog::info("Running local delete script: $deleteScript $clientName");
+        $output = shell_exec("sudo -u utar {$deleteScript} {$clientName} 2>&1");
+        Log::info("Delete output: $output");
 
         $client->delete();
 
