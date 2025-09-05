@@ -109,6 +109,15 @@
         .content-area {
             padding: 20px;
         }
+
+        .nav-link.active {
+            font-weight: bold;
+            color: #0d6efd !important; /* bootstrap primary */
+        }
+        .nav-link.active-parent {
+            font-weight: bold;
+            color: #0a58ca !important; /* darker primary */
+        }
     </style>
 </head>
 <body>
@@ -121,24 +130,34 @@
         </div>
 
         {{-- Overview --}}
-        <a href="#" class="nav-link sidebar-toggle" data-target="overviewMenu">
+        <a href="#" class="nav-link sidebar-toggle {{ request()->is('devices') || request()->is('networks/*/devices') ? 'active-parent' : '' }}"
+        data-target="overviewMenu">
             <i class="mdi mdi-chart-line"></i>
             <span>Overview</span>
         </a>
-        <ul id="overviewMenu" class="nav flex-column ms-3" style="display: none;">
+        <ul id="overviewMenu" class="nav flex-column ms-3"
+            style="display: {{ request()->is('devices') || request()->is('networks/*/devices') ? 'block' : 'none' }};">
+            
+            {{-- Devices --}}
             <li class="nav-item">
-                <a href="{{ url('/devices') }}" class="nav-link">
+                <a href="{{ url('/devices') }}"
+                class="nav-link {{ request()->is('devices') ? 'active' : '' }}">
                     <i class="mdi mdi-devices"></i> Devices
                 </a>
             </li>
+
+            {{-- Devices in Networks --}}
             <li class="nav-item">
-                <a href="#" class="nav-link sidebar-toggle" data-target="devicesInNetworksMenu">
+                <a href="#" class="nav-link sidebar-toggle {{ request()->is('networks/*/devices') ? 'active-parent' : '' }}"
+                data-target="devicesInNetworksMenu">
                     <i class="mdi mdi-lan-connect"></i> Devices in Networks ▾
                 </a>
-                <ul id="devicesInNetworksMenu" class="nav flex-column ms-3" style="display: none;">
+                <ul id="devicesInNetworksMenu" class="nav flex-column ms-3"
+                    style="display: {{ request()->is('networks/*/devices') ? 'block' : 'none' }};">
                     @foreach(\App\Models\Network::all() as $network)
                         <li class="nav-item">
-                            <a href="{{ route('network.devices', ['network' => $network->id]) }}" class="nav-link">
+                            <a href="{{ route('network.devices', ['network' => $network->id]) }}"
+                            class="nav-link {{ request()->is('networks/'.$network->id.'/devices') ? 'active' : '' }}">
                                 {{ $network->name }}
                             </a>
                         </li>
@@ -147,25 +166,71 @@
             </li>
         </ul>
 
+
         {{-- Configuration --}}
-        <a href="#" class="nav-link sidebar-toggle" data-target="configMenu">
+        <a href="#" class="nav-link sidebar-toggle {{ request()->is('routers') || request()->is('standalone_clients') || request()->is('networks') || request()->is('networks/*/network_devices') ? 'active-parent' : '' }}"
+        data-target="configMenu">
             <i class="mdi mdi-cogs"></i>
             <span>Configuration</span>
         </a>
-        <ul id="configMenu" class="nav flex-column ms-3" style="display: none;">
-            <li><a href="{{ url('/routers') }}" class="nav-link"><i class="mdi mdi-lan"></i> Routers</a></li>
-            <li><a href="{{ url('/standalone_clients') }}" class="nav-link"><i class="mdi mdi-laptop"></i> Standalone Clients</a></li>
-            <li><a href="{{ url('/networks') }}" class="nav-link"><i class="mdi mdi-access-point-network"></i> Networks</a></li>
+        <ul id="configMenu" class="nav flex-column ms-3"
+            style="display: {{ request()->is('routers') || request()->is('standalone_clients') || request()->is('networks') || request()->is('networks/*/network_devices') ? 'block' : 'none' }};">
+
+            <li>
+                <a href="{{ url('/routers') }}" class="nav-link {{ request()->is('routers') ? 'active' : '' }}">
+                    <i class="mdi mdi-lan"></i> Routers
+                </a>
+            </li>
+            <li>
+                <a href="{{ url('/standalone_clients') }}" class="nav-link {{ request()->is('standalone_clients') ? 'active' : '' }}">
+                    <i class="mdi mdi-laptop"></i> Standalone Clients
+                </a>
+            </li>
+            <li>
+                <a href="{{ url('/networks') }}" class="nav-link {{ request()->is('networks') ? 'active' : '' }}">
+                    <i class="mdi mdi-access-point-network"></i> Networks
+                </a>
+            </li>
+
+            {{-- Network Devices --}}
+            <li class="nav-item">
+                <a href="#" class="nav-link sidebar-toggle {{ request()->is('networks/*/network_devices') ? 'active-parent' : '' }}"
+                data-target="networkDevicesMenu">
+                    <i class="mdi mdi-lan-connect"></i> Network Devices ▾
+                </a>
+                <ul id="networkDevicesMenu" class="nav flex-column ms-3"
+                    style="display: {{ request()->is('networks/*/network_devices') ? 'block' : 'none' }};">
+                    @foreach(\App\Models\Network::all() as $network)
+                        <li class="nav-item">
+                            <a href="{{ route('network.networkDevices', ['network' => $network->id]) }}"
+                            class="nav-link {{ request()->is('networks/'.$network->id.'/network_devices') ? 'active' : '' }}">
+                                {{ $network->name }}
+                            </a>
+                        </li>
+                    @endforeach
+                </ul>
+            </li>
         </ul>
 
+
         {{-- Administration --}}
-        <a href="#" class="nav-link sidebar-toggle" data-target="adminMenu">
+        <a href="#" class="nav-link sidebar-toggle {{ request()->is('admin_accounts') || request()->is('client_accounts') ? 'active-parent' : '' }}"
+        data-target="adminMenu">
             <i class="mdi mdi-account-multiple"></i>
             <span>Administration</span>
         </a>
-        <ul id="adminMenu" class="nav flex-column ms-3" style="display: none;">
-            <li><a href="{{ url('/admin_accounts') }}" class="nav-link"><i class="mdi mdi-account-key"></i> Admin Accounts</a></li>
-            <li><a href="{{ url('/client_accounts') }}" class="nav-link"><i class="mdi mdi-account"></i> Client Accounts</a></li>
+        <ul id="adminMenu" class="nav flex-column ms-3"
+            style="display: {{ request()->is('admin_accounts') || request()->is('client_accounts') ? 'block' : 'none' }};">
+            <li>
+                <a href="{{ url('/admin_accounts') }}" class="nav-link {{ request()->is('admin_accounts') ? 'active' : '' }}">
+                    <i class="mdi mdi-account-key"></i> Admin Accounts
+                </a>
+            </li>
+            <li>
+                <a href="{{ url('/client_accounts') }}" class="nav-link {{ request()->is('client_accounts') ? 'active' : '' }}">
+                    <i class="mdi mdi-account"></i> Client Accounts
+                </a>
+            </li>
         </ul>
     </div>
         
@@ -211,7 +276,9 @@
 
         const toggleBtn = document.getElementById('userDropdown'); 
         const menu = document.getElementById('dropdownMenu'); 
-        function toggleDropdown() { menu.classList.toggle('show'); } 
+        function toggleDropdown() { 
+            menu.classList.toggle('show'); 
+        } 
         // Close dropdown when clicking outside 
         document.addEventListener('click', function(e) { 
             if (!toggleBtn.contains(e.target)) { 

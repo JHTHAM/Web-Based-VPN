@@ -38,7 +38,7 @@
         @foreach ($networks as $network)
             <tr>
                 <td>
-                    <a href="{{ route('network.devices', $network->id) }}">
+                    <a href="{{ route('network.networkDevices', $network->id) }}">
                         {{ $network->name }}
                     </a>
                 </td>

@@ -55,6 +55,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/routers', fn() => view('routers'));
     Route::get('/standalone_clients', fn() => view('standalone_clients'));
     Route::get('/networks', fn() => view('networks'));
+    Route::get('/network_devices', fn() => view('network_devices'));
     Route::get('/admin_accounts', fn() => view('admin_accounts'));
     Route::get('/client_accounts', fn() => view('client_accounts'));
     Route::get('/profile', fn() => view('profile'));
@@ -78,6 +79,8 @@ Route::post('/networks', [NetworkController::class, 'store'])->name('networks.st
 Route::delete('/networks/{network}', [NetworkController::class, 'destroy'])->name('networks.destroy');
 
 Route::get('/networks/{network}/devices', [NetworkController::class, 'devices'])->name('network.devices');
+Route::get('/networks/{network}/network_devices', [NetworkController::class, 'networkDevices'])->name('network.networkDevices');
+
 Route::post('/networks/{network}/devices', [NetworkController::class, 'addDevices'])->name('network.devices.store');
 Route::delete('/networks/{network}/devices/{router}', [NetworkController::class, 'removeDevice'])->name('network.devices.destroy');
 

@@ -55,6 +55,7 @@
                 <label for="role">Role</label>
                 <select name="role" class="form-select" required>
                     @if(auth()->user()->role === 'superadmin')
+                        <option value="superadmin">Superadmin</option>  // Let superadmin to assign 1, 2 more superadmin
                         <option value="admin">Admin</option>
                         <option value="client" selected>Client</option>
                     @else
