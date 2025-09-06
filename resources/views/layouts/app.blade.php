@@ -305,8 +305,13 @@
         });
     </script>
 
-    <footer class="text-center py-2 mt-4 text-muted fixed-bottom" style="margin-left: 250px;">
-        Powered by <strong>Novaflow Technology Sdn Bhd</strong>
+    <footer class="py-2 mt-4 text-muted fixed-bottom d-flex align-items-center" style="margin-left: 250px;">
+        <div class="footer-left" style="position: absolute; left: 20px;">
+            <small>Version 2.10.21</small>
+        </div>
+        <div class="footer-center text-center w-100">
+            Powered by <strong>Novaflow Technology Sdn Bhd</strong>
+        </div>
     </footer>
 </body>
 </html>
