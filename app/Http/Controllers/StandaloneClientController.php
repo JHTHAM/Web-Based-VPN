@@ -84,7 +84,7 @@ class StandaloneClientController extends Controller
         $output = shell_exec("sudo -u utar {$scriptPath} {$clientName} 2>&1");
         Log::info("Script output: $output");
 
-        $lines = explode("\n", trim($sshOutput));
+        $lines = explode("\n", trim($output));
         $assignedIp = end($lines);
 
         $remoteFile = "/opt/vpn/client-ovpn/{$name}.ovpn";
