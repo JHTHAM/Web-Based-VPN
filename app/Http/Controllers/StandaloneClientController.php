@@ -116,7 +116,7 @@ class StandaloneClientController extends Controller
         $clientName = escapeshellarg($name);
         $deleteScript = "/opt/vpn/client-configs/delete_ovpn.sh";
         
-        LLog::info("Running local delete script: $deleteScript $clientName");
+        Log::info("Running local delete script: $deleteScript $clientName");
         $output = shell_exec("sudo -u utar {$deleteScript} {$clientName} 2>&1");
         Log::info("Delete output: $output");
 
