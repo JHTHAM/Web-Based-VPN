@@ -58,10 +58,9 @@ class NetworkController extends Controller
 
     public function fetchStatus()
     {
-        $remoteFile = '/etc/openvpn/openvpn-status.log';
-        $sshCommand = "ssh utar@10.8.0.1 \"cat $remoteFile\"";
-        $output = shell_exec($sshCommand);
-
+        $statusFile = '/etc/openvpn/openvpn-status.log';
+        $output = @file_get_contents($statusFile);
+        
         $activeRouters = [];
 
         if ($output) {
