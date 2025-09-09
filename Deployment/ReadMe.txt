@@ -99,6 +99,7 @@ sudo -u www-data /opt/shared_vpn/client-configs/generate_ovpn.sh TESTUSER
 cd /var/www/vpn-dashboard
 sudo chown -R www-data:www-data storage bootstrap/cache .env
 sudo chmod -R 775 storage bootstrap/cache
+sudo chown utar:www-data .env
 sudo chmod 664 .env
 
 # Clear Laravel caches
