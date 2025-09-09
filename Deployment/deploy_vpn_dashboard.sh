@@ -14,7 +14,7 @@ DB_USERNAME="openvpn"
 DB_PASSWORD="Nov@flow6889"
 
 # OpenVPN
-OVPN_STATUS_LOG="/etc/openvpn/status.log"
+OVPN_STATUS_LOG="/etc/openvpn/openvpn-status.log"
 SCRIPTS_DIR="/opt/vpn/client-configs"
 SCRIPTS=("generate_router_ovpn.sh" "generate_client_ovpn.sh" "delete_ovpn.sh")
 
