@@ -88,7 +88,13 @@ sed -i "s/^DB_DATABASE=.*/DB_DATABASE=${DB_DATABASE}/" .env
 sed -i "s/^DB_USERNAME=.*/DB_USERNAME=${DB_USERNAME}/" .env
 sed -i "s~^DB_PASSWORD=.*~DB_PASSWORD=${DB_PASSWORD}~" .env
 
-grep -q "^APP_KEY=" .env || sudo -u www-data php artisan key:generate --force
+# Fix APP_KEY (always ensure it exists)
+if ! grep -q "APP_KEY=base64:" .env; then
+  log "Generating new APP_KEY..."
+  sudo -u www-data php artisan key:generate --force || true
+else
+  log "APP_KEY already set"
+fi
 
 # Composer deps
 log "Installing Laravel dependencies..."
@@ -118,6 +124,8 @@ server {
         include snippets/fastcgi-php.conf;
         fastcgi_pass unix:/run/php/php${PHP_VERSION}-fpm.sock;
         fastcgi_param SCRIPT_FILENAME \$realpath_root\$fastcgi_script_name;
+        fastcgi_param HTTPS on;
+        fastcgi_param HTTP_X_FORWARDED_PROTO https;
         include fastcgi_params;
     }
     location ~ /\.ht { deny all; }
