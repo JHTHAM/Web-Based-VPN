@@ -81,7 +81,7 @@ class StandaloneClientController extends Controller
         $scriptPath = "/opt/vpn/client-configs/generate_client_ovpn.sh";
 
         Log::info("Running local script: $scriptPath $clientName");
-        $output = shell_exec("sudo -u utar {$scriptPath} {$clientName} 2>&1");
+        $output = shell_exec("sudo {$scriptPath} {$clientName} 2>&1");
         Log::info("Script output: $output");
 
         $lines = explode("\n", trim($output));

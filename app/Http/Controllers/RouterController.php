@@ -105,7 +105,7 @@ class RouterController extends Controller
         $scriptPath = "/opt/vpn/client-configs/generate_router_ovpn.sh";
 
         Log::info("Running local script: $scriptPath $clientName");
-        $output = shell_exec("sudo -u utar {$scriptPath} {$clientName} 2>&1");
+        $output = shell_exec("sudo {$scriptPath} {$clientName} 2>&1");
         Log::info("Script output: $output");
 
         // Assigned IP should be last line of script output
