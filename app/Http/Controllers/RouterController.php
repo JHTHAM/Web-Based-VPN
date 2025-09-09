@@ -102,7 +102,7 @@ class RouterController extends Controller
         ]);
 
         $clientName = escapeshellarg($name);
-        $scriptPath = "/opt/shared_vpn/client-configs/generate_router_ovpn.sh";
+        $scriptPath = "/opt/vpn/client-configs/generate_router_ovpn.sh";
 
         Log::info("Running local script: $scriptPath $clientName");
         $output = shell_exec("sudo -u utar {$scriptPath} {$clientName} 2>&1");
@@ -113,7 +113,7 @@ class RouterController extends Controller
         $assignedIp = end($lines);
 
         // Copy generated file to Laravel storage
-        $remoteFile = "/opt/shared_vpn/client-configs/files/{$name}.ovpn";
+        $remoteFile = "/opt/vpn/client-ovpn/{$name}.ovpn";
         $localDir = storage_path('app/ovpn');
         $localPath = "{$localDir}/{$name}.ovpn";
 
@@ -142,7 +142,7 @@ class RouterController extends Controller
         $name = $router->name;
 
         $clientName = escapeshellarg($name);
-        $deleteScript = "/opt/shared_vpn/client-configs/delete_ovpn.sh";
+        $deleteScript = "/opt/vpn/client-configs/delete_ovpn.sh";
 
         Log::info("Running local delete script: $deleteScript $clientName");
         $output = shell_exec("sudo -u utar {$deleteScript} {$clientName} 2>&1");

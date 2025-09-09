@@ -4,8 +4,8 @@ set -euo pipefail
 # ===== Variables =====
 REPO_URL="https://github.com/JHTHAM/Web-Based-VPN.git"
 APP_DIR="/var/www/vpn-dashboard"
-PHP_VERSION="8.2"
-SERVER_NAME="_"
+PHP_VERSION="8.3"
+SERVER_NAME="vpn.novaplus.my"
 DB_CONNECTION="mysql"
 DB_HOST="db.novaplus.my"
 DB_PORT="3306"
@@ -14,9 +14,9 @@ DB_USERNAME="openvpn"
 DB_PASSWORD="Nov@flow6889"
 
 # OpenVPN
-OVPN_STATUS_LOG="/etc/openvpn/server/status.log"
-SCRIPTS_DIR="/opt/shared_vpn/client-configs"
-SCRIPTS=("generate_ovpn.sh" "delete_ovpn.sh")
+OVPN_STATUS_LOG="/etc/openvpn/status.log"
+SCRIPTS_DIR="/opt/vpn/client-configs"
+SCRIPTS=("generate_router_ovpn.sh" "generate_client_ovpn.sh" "delete_ovpn.sh")
 
 # Colors
 GREEN='\033[0;32m'; YELLOW='\033[0;33m'; RED='\033[0;31m'; NC='\033[0m'
@@ -34,24 +34,32 @@ apt-get update -y
 log "Installing base tools..."
 apt-get install -y curl git unzip ca-certificates lsb-release apt-transport-https
 
-# PHP install
-if ! apt-cache policy "php${PHP_VERSION}-fpm" | grep -q "Candidate:"; then
-  log "Adding PPA for PHP ${PHP_VERSION}..."
-  apt-get install -y software-properties-common
-  add-apt-repository -y ppa:ondrej/php
-  apt-get update -y
+# PHP install (skip if already installed)
+if ! command -v php &>/dev/null; then
+  log "Installing PHP ${PHP_VERSION}..."
+  if ! apt-cache policy "php${PHP_VERSION}-fpm" | grep -q "Candidate:"; then
+    log "Adding PPA for PHP ${PHP_VERSION}..."
+    apt-get install -y software-properties-common
+    add-apt-repository -y ppa:ondrej/php
+    apt-get update -y
+  fi
+  apt-get install -y php${PHP_VERSION} php${PHP_VERSION}-fpm php${PHP_VERSION}-mysql \
+  php${PHP_VERSION}-xml php${PHP_VERSION}-mbstring php${PHP_VERSION}-curl \
+  php${PHP_VERSION}-zip php${PHP_VERSION}-bcmath
+else
+  log "PHP already installed: $(php -v | head -n1)"
 fi
-apt-get install -y php${PHP_VERSION} php${PHP_VERSION}-fpm php${PHP_VERSION}-mysql php${PHP_VERSION}-xml \
-php${PHP_VERSION}-mbstring php${PHP_VERSION}-curl php${PHP_VERSION}-zip php${PHP_VERSION}-bcmath
 
-# Composer
+# Composer (skip if already installed)
 if ! command -v composer &>/dev/null; then
   log "Installing Composer..."
   curl -sS https://getcomposer.org/installer | php
   mv composer.phar /usr/local/bin/composer
+else
+  log "Composer already installed: $(composer --version)"
 fi
 
-# Nginx
+# Nginx (skip if already installed)
 if ! command -v nginx &>/dev/null; then
   log "Installing Nginx..."
   apt-get install -y nginx
@@ -80,7 +88,7 @@ sed -i "s/^DB_DATABASE=.*/DB_DATABASE=${DB_DATABASE}/" .env
 sed -i "s/^DB_USERNAME=.*/DB_USERNAME=${DB_USERNAME}/" .env
 sed -i "s~^DB_PASSWORD=.*~DB_PASSWORD=${DB_PASSWORD}~" .env
 
-grep -q "^APP_KEY=base64" .env || sudo -u www-data php artisan key:generate --force
+grep -q "^APP_KEY=" .env || sudo -u www-data php artisan key:generate --force
 
 # Composer deps
 log "Installing Laravel dependencies..."
@@ -158,7 +166,7 @@ After=network.target
 User=www-data
 Group=www-data
 Restart=always
-ExecStart=/usr/bin/php ${APP_DIR}/artisan queue:work --sleep=3 --tries=3 --timeout=90
+ExecStart=/usr/bin/php${PHP_VERSION} ${APP_DIR}/artisan schedule:run >> /dev/null 2>&1"
 [Install]
 WantedBy=multi-user.target
 EOF

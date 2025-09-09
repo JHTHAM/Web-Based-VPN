@@ -78,7 +78,7 @@ class StandaloneClientController extends Controller
         ]);
 
         $clientName = escapeshellarg($name);
-        $scriptPath = "/opt/shared_vpn/client-configs/generate_client_ovpn.sh";
+        $scriptPath = "/opt/vpn/client-configs/generate_client_ovpn.sh";
 
         Log::info("Running local script: $scriptPath $clientName");
         $output = shell_exec("sudo -u utar {$scriptPath} {$clientName} 2>&1");
@@ -87,7 +87,7 @@ class StandaloneClientController extends Controller
         $lines = explode("\n", trim($sshOutput));
         $assignedIp = end($lines);
 
-        $remoteFile = "/opt/shared_vpn/client-configs/files/{$name}.ovpn";
+        $remoteFile = "/opt/vpn/client-ovpn/{$name}.ovpn";
         $localDir = storage_path('app/ovpn');
         $localPath = "{$localDir}/{$name}.ovpn";
 
@@ -114,7 +114,7 @@ class StandaloneClientController extends Controller
         $name   = $client->name;
 
         $clientName = escapeshellarg($name);
-        $deleteScript = "/opt/shared_vpn/client-configs/delete_ovpn.sh";
+        $deleteScript = "/opt/vpn/client-configs/delete_ovpn.sh";
         
         LLog::info("Running local delete script: $deleteScript $clientName");
         $output = shell_exec("sudo -u utar {$deleteScript} {$clientName} 2>&1");
